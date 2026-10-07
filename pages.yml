@@ -1,0 +1,46 @@
+# Publishes site/index.html (the web-site build of the page) to GitHub Pages.
+#
+# It runs ONLY when started by hand: Actions → "Deploy standalone page to GitHub Pages" → Run workflow.
+# Before the first run: Settings → Pages → Build and deployment → Source: "GitHub Actions".
+#
+# READ README.md FIRST. A GitHub Pages site is public on the internet.
+#   - with site.backendUrl set in build.config.json, the page saves through the Google Apps Script back end
+#     (shared data, Google Sheet) and asks every visitor for the access code first: see backend/SETUP_TH.md
+#   - without it, every browser keeps its own data and nothing reaches Google Sheet
+name: Deploy standalone page to GitHub Pages
+
+on:
+  workflow_dispatch:
+  # To publish automatically on every change to the main branch, remove the "#" from the next two lines.
+  # push:
+  #   branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build the page
+        run: node build.mjs
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

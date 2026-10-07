@@ -1,0 +1,2614 @@
+<title>สภาพ บ.ประจำวัน ฝูง.602</title>
+<style>
+@font-face { font-family: "TH SarabunPSK"; font-weight: 400; font-style: normal; font-display: block; src: url(data:font/ttf;base64,__FONT_REGULAR__) format("truetype"); }
+@font-face { font-family: "TH SarabunPSK"; font-weight: 700; font-style: normal; font-display: block; src: url(data:font/ttf;base64,__FONT_BOLD__) format("truetype"); }
+/* Layout: a sticky command bar (CLEAR · PREVIEW · PRINT TO PDF · EXPORT TO EXCEL · SAVE) over one working sheet
+   that mirrors the paper form column for column: locked A–C hatched, D–J as fields, grey text = last saved value. */
+:root {
+  --bg: #e9edf1;
+  --surface: #ffffff;
+  --surface-2: #f3f6f8;
+  --ink: #16212c;
+  --ink-2: #52616f;
+  --hint: #8d99a5;
+  --line: #d3dae1;
+  --line-strong: #9eabb8;
+  --accent: #1c4f80;
+  --accent-ink: #ffffff;
+  --accent-soft: #e0ebf5;
+  --locked: #e4e9ee;
+  --locked-hatch: #d5dce3;
+  --locked-ink: #37444f;
+  --field: #ffffff;
+  --warn: #8a5200;
+  --warn-soft: #fbefd6;
+  --bad: #ad2318;
+  --bad-soft: #fbe4e1;
+  --bad-ink: #ffffff;
+  --cream: #fff3c9;
+  --cream-ink: #16212c;
+  --ok: #1b7446;
+  --focus: #2b7fd6;
+  --paper: #ffffff;
+  --veil: rgba(12, 22, 32, .5);
+  --shadow: 0 1px 2px rgba(18, 32, 46, .08), 0 8px 24px rgba(18, 32, 46, .10);
+  --ui: "TH SarabunPSK", "TH Sarabun New", "Leelawadee UI", Tahoma, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f151b; --surface: #18212a; --surface-2: #1e2933; --ink: #e5ecf2; --ink-2: #9db0c0; --hint: #6f8292;
+    --line: #2b3844; --line-strong: #4a5c6c; --accent: #74b4ea; --accent-ink: #0a1824; --accent-soft: #1a3046;
+    --locked: #222d38; --locked-hatch: #2b3845; --locked-ink: #bcc9d4; --field: #121a22;
+    --warn: #f0b860; --warn-soft: #3a2c12; --bad: #ff8a7d; --bad-soft: #3d1c19; --bad-ink: #2a0c08; --ok: #6fd3a0; --focus: #74b4ea; --paper: #ffffff;
+    --veil: rgba(0, 0, 0, .6); --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f151b; --surface: #18212a; --surface-2: #1e2933; --ink: #e5ecf2; --ink-2: #9db0c0; --hint: #6f8292;
+  --line: #2b3844; --line-strong: #4a5c6c; --accent: #74b4ea; --accent-ink: #0a1824; --accent-soft: #1a3046;
+  --locked: #222d38; --locked-hatch: #2b3845; --locked-ink: #bcc9d4; --field: #121a22;
+  --warn: #f0b860; --warn-soft: #3a2c12; --bad: #ff8a7d; --bad-soft: #3d1c19; --bad-ink: #2a0c08; --ok: #6fd3a0; --focus: #74b4ea; --paper: #ffffff;
+  --veil: rgba(0, 0, 0, .6); --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-size: 22px; line-height: 1.15; }
+h1, h2, h3, p, ul { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+/* ---------- command bar ---------- */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--surface); border-bottom: 1px solid var(--line-strong); }
+.bar-in { max-width: 1440px; margin: 0 auto; padding: 8px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; }
+.brand { display: flex; flex-direction: column; min-width: 0; }
+.brand .unit { font-size: 19px; color: var(--ink-2); letter-spacing: .03em; }
+.brand h1 { font-size: 30px; font-weight: 700; line-height: 1; }
+.status { font-size: 20px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 7px; margin-right: auto; }
+.status::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--line-strong); flex: none; }
+.status[data-s="saved"]::before { background: var(--ok); }
+.status[data-s="dirty"]::before, .status[data-s="loading"]::before { background: var(--warn); }
+.status[data-s="error"]::before { background: var(--bad); }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.btn { border: 1px solid var(--line-strong); background: var(--surface); padding: 4px 14px; border-radius: 6px; cursor: pointer; font-weight: 700; white-space: nowrap; letter-spacing: .02em; }
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.08); background: var(--accent); }
+.btn.danger { color: var(--bad); border-color: var(--bad); }
+.btn.danger:hover { background: var(--bad-soft); }
+.btn[disabled] { opacity: .55; cursor: progress; }
+.btn.quiet { border-color: transparent; background: transparent; padding: 0 6px; font-weight: 400; color: var(--accent); }
+.btn.quiet:hover { background: var(--accent-soft); }
+.btn.small { padding: 1px 10px; font-weight: 400; }
+.ic { border: 0; background: transparent; color: var(--ink-2); cursor: pointer; width: 26px; height: 26px; border-radius: 4px; line-height: 1; padding: 0; flex: none; }
+.ic:hover { background: var(--bad-soft); color: var(--bad); }
+.ic.mv:hover { background: var(--accent-soft); color: var(--accent); }
+.ic[disabled] { opacity: .3; cursor: default; }
+
+/* ---------- page ---------- */
+main { max-width: 1440px; margin: 0 auto; padding-inline: 20px; padding-block: 18px 56px; display: grid; gap: 18px; }
+.panel { display: grid; gap: 18px; min-width: 0; }
+.block { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
+.block > header { padding: 7px 14px; border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; }
+.block > header h2 { font-size: 25px; font-weight: 700; margin-right: auto; }
+.block .body { padding: 12px 14px; }
+.block > footer { padding: 8px 14px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.hint { font-size: 19px; color: var(--ink-2); }
+.col-tag { font-size: 15px; font-weight: 700; padding: 0 6px; border-radius: 3px; background: var(--accent-soft); color: var(--accent); }
+.meter { font-size: 20px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.meter.over { color: var(--bad); font-weight: 700; }
+
+label.f { display: grid; gap: 1px; min-width: 0; }
+label.f > span, .lab { font-size: 19px; color: var(--ink-2); }
+input[type="text"], input[type="date"], input[type="password"], input[type="number"], select {
+  width: 100%; min-width: 0; background: var(--field); border: 1px solid var(--line-strong); border-radius: 4px;
+  padding: 1px 7px; font-size: 22px; line-height: 1.2; height: 32px;
+}
+input::placeholder { color: var(--hint); opacity: 1; }
+input[readonly] { cursor: pointer; }
+input.bad, input.bad:focus-visible { border-color: var(--bad); outline: 2px solid var(--bad); outline-offset: 0; }
+input.over, input.over:focus-visible { background: var(--cream); color: var(--cream-ink); border-color: var(--bad); outline: 1px solid var(--bad); outline-offset: -2px; }
+.num { font-variant-numeric: tabular-nums; text-align: center; }
+.cb { position: relative; display: block; min-width: 0; }
+.cb input { padding-right: 20px; }
+.cb::after { content: ""; position: absolute; right: 7px; top: 50%; margin-top: -2px; border: 5px solid transparent; border-top-color: var(--ink-2); pointer-events: none; }
+
+/* ---------- report heading ---------- */
+.head-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; max-width: 760px; }
+.head-print { margin-top: 12px; padding: 8px 12px; border: 1px dashed var(--line-strong); border-radius: 4px; font-weight: 700; text-align: center; font-size: 22px; text-wrap: balance; }
+
+/* ---------- aircraft sheet ---------- */
+.legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; font-size: 20px; color: var(--ink-2); }
+.legend .sw { display: inline-block; width: 22px; height: 14px; border-radius: 3px; border: 1px solid var(--line-strong); vertical-align: -1px; margin-right: 6px; }
+.sw.lock, .c.lock, table.sum th[scope="row"], table.sum td.calc { background: repeating-linear-gradient(135deg, var(--locked) 0 6px, var(--locked-hatch) 6px 7px); }
+.sw.edit { background: var(--field); }
+.sw.grey { background: var(--field); position: relative; }
+.sw.grey::after { content: ""; position: absolute; inset: 5px 3px; background: var(--hint); border-radius: 2px; }
+.switch { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: var(--ink); }
+.switch input { width: 17px; height: 17px; accent-color: var(--accent); margin: 0; }
+
+.scroll { overflow-x: auto; }
+.grid { min-width: 1290px; }
+.grid.show-key { min-width: 1420px; }
+.r { display: grid; grid-template-columns: 50px 88px 96px 168px 104px 244px minmax(260px, 1fr) 290px; }
+.show-key .r { grid-template-columns: 50px 88px 96px 168px 104px 244px minmax(260px, 1fr) 290px 130px; }
+.c { padding: 8px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line-strong); min-width: 0; display: grid; gap: 5px; align-content: start; }
+.c:last-child, .grid:not(.show-key) .c.rem { border-right: 0; }
+.grid .r:last-child .c { border-bottom: 0; }
+.c.key { display: none; }
+.show-key .c.key { display: grid; }
+.r.h .c { padding: 5px 8px; background: var(--surface-2); font-weight: 700; text-align: center; justify-items: center; gap: 0; }
+.r.h .c small { font-weight: 400; font-size: 18px; color: var(--ink-2); }
+.lockmark { display: inline-flex; align-items: center; gap: 3px; font-size: 15px; font-weight: 400; color: var(--ink-2); }
+.lockmark svg { width: 10px; height: 10px; }
+.c.lock { color: var(--locked-ink); font-size: 22px; text-align: center; justify-items: center; cursor: not-allowed; }
+.c.lock b { font-weight: 700; }
+.c.key .keyv { font-weight: 700; font-size: 20px; }
+.st-top { display: grid; grid-template-columns: 54px 1fr; gap: 5px; }
+.eng { display: grid; grid-template-columns: 44px 1fr 26px 1fr; align-items: center; gap: 4px; }
+.eng span { font-size: 17px; color: var(--ink-2); }
+.eng input { padding-inline: 4px; }
+.lines { display: grid; gap: 4px; }
+.ln { display: flex; gap: 2px; align-items: center; position: relative; }
+.ln.over::after { content: "ข้อความยาวเกินไป"; position: absolute; left: 8px; top: calc(100% + 1px); z-index: 6; display: none; pointer-events: none; white-space: nowrap;
+  background: var(--bad); color: var(--bad-ink); padding: 0 10px; border-radius: 4px; font-size: 20px; box-shadow: var(--shadow); }
+.ln.over:hover::after, .ln.over:focus-within::after { display: block; }
+.cb.over::before { content: "ข้อความยาวเกินไป"; position: absolute; left: 8px; top: calc(100% + 1px); z-index: 6; display: none; pointer-events: none; white-space: nowrap;
+  background: var(--bad); color: var(--bad-ink); padding: 0 10px; border-radius: 4px; font-size: 20px; box-shadow: var(--shadow); }
+.cb.over:hover::before, .cb.over:focus-within::before { display: block; }
+.ln input { flex: 1; }
+.rem-line { display: grid; gap: 2px; }
+.rem-line .lab { display: flex; align-items: center; gap: 6px; }
+.chk { display: grid; grid-template-columns: 1fr; gap: 5px; }
+.chk.heavy { grid-template-columns: 1fr 92px; }
+.range { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.range label { display: grid; font-size: 18px; color: var(--ink-2); }
+.out { font-size: 20px; color: var(--ink-2); display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; min-height: 24px; }
+.out b { font-weight: 700; color: var(--ink); }
+.out .err { color: var(--bad); }
+.out .grey { color: var(--hint); }
+.c[data-label]::before { display: none; }
+
+/* ---------- lower area ---------- */
+.lower { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.sum-wrap { overflow-x: auto; }
+@media (max-width: 1150px) { .lower { grid-template-columns: minmax(0, 1fr); } }
+table.sum { width: 100%; border-collapse: collapse; }
+table.sum th, table.sum td { border: 1px solid var(--line); padding: 3px 5px; }
+table.sum thead th { background: var(--surface-2); font-weight: 700; white-space: nowrap; }
+table.sum th[scope="row"] { text-align: left; font-weight: 400; color: var(--locked-ink); }
+table.sum th[scope="row"] .rl { display: flex; align-items: center; gap: 2px; }
+table.sum th[scope="row"] .rl span { flex: 1; min-width: 0; }
+table.sum td { min-width: 86px; }
+table.sum td.calc { text-align: center; color: var(--locked-ink); font-variant-numeric: tabular-nums; cursor: not-allowed; }
+table.sum td input { padding: 0 4px; height: 29px; }
+table.sum th[scope="row"] { min-width: 250px; }
+.signs { display: grid; gap: 12px; }
+.sign { display: grid; gap: 6px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.sign:last-child { border-bottom: 0; padding-bottom: 0; }
+.sign h3 { font-size: 21px; font-weight: 700; }
+.sign .two { display: grid; grid-template-columns: 130px 1fr; gap: 8px; }
+.sign .three { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.sign .pick { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+.sign .pick label { flex: 1 1 200px; }
+
+/* ---------- A4 preview ---------- */
+.pv-info { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.pv-info .meta { color: var(--ink-2); margin-right: auto; font-variant-numeric: tabular-nums; }
+.note { padding: 6px 12px; border-radius: 6px; background: var(--warn-soft); color: var(--warn); }
+.note.row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-bottom: 12px; }
+.paper-wrap { display: grid; justify-items: center; }
+#paper, .paper { width: 100%; max-width: 860px; height: auto; aspect-ratio: 210 / 297; background: var(--paper); box-shadow: var(--shadow); border: 1px solid var(--line-strong); }
+
+.done .body { display: grid; gap: 8px; justify-items: start; }
+.done-k { color: var(--ok); font-weight: 700; font-size: 24px; }
+.done h2 { font-size: 32px; font-weight: 700; line-height: 1.1; }
+.done h2:focus { outline: none; }
+.done-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+#saved-info { min-height: 26px; }
+
+/* ---------- Google Sheet status and the look-back page ---------- */
+.gs-chip { font-weight: 400; white-space: normal; max-width: 100%; text-align: left; }
+.gs-chip[data-s="warn"] { color: var(--warn); border-color: var(--warn); background: var(--warn-soft); }
+.gs-chip[data-s="ok"] { color: var(--ok); }
+.gs-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 5px 12px; border-radius: 6px; background: var(--surface-2); }
+.gs-line[data-s="ok"] { color: var(--ok); }
+.gs-line[data-s="warn"] { background: var(--warn-soft); color: var(--warn); }
+.gs-line a { color: var(--accent); }
+.hist-top { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto auto auto; gap: 12px; align-items: end; }
+.hist-list { display: grid; gap: 4px; max-height: 420px; overflow: auto; margin-top: 10px; }
+.hrow { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 12px; text-align: left; align-items: baseline; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 2px 10px; cursor: pointer; }
+.hrow:hover, .hrow[aria-current="true"] { background: var(--accent-soft); border-color: var(--accent); }
+.hrow b { font-weight: 700; }
+.hrow span { color: var(--ink-2); }
+@media (max-width: 900px) {
+  .hist-top { grid-template-columns: minmax(0, 1fr); }
+  .hrow { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}
+
+/* ---------- popup list, dialog, toast ---------- */
+#pop { position: fixed; z-index: 60; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 6px; box-shadow: var(--shadow); max-height: 290px; overflow: auto; padding: 4px; min-width: 120px; }
+.opt { padding: 1px 10px; border-radius: 4px; cursor: pointer; display: flex; gap: 12px; align-items: baseline; justify-content: space-between; white-space: nowrap; }
+.opt[aria-selected="true"], .opt:hover { background: var(--accent-soft); }
+.opt small { color: var(--ink-2); font-size: 18px; }
+.opt .tail { display: inline-flex; align-items: baseline; gap: 8px; }
+.opt.gone > span:first-child { text-decoration: line-through; color: var(--hint); }
+.opt .del { border: 0; background: transparent; color: var(--bad); cursor: pointer; font-size: 20px; line-height: 1; padding: 0 6px; border-radius: 3px; }
+.opt .del:hover { background: var(--bad-soft); }
+dialog { border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); color: var(--ink); padding: 0; width: min(92vw, 540px); box-shadow: var(--shadow); }
+dialog::backdrop { background: var(--veil); }
+.dlg { display: grid; gap: 10px; padding: 16px 18px; }
+.dlg h3 { font-size: 24px; font-weight: 700; }
+.dlg p { white-space: pre-line; }
+.dlg ul { padding-left: 22px; display: grid; gap: 2px; max-height: 46vh; overflow: auto; }
+.dlg .fields { display: grid; gap: 8px; }
+.dlg .chkrow { display: flex; gap: 8px; align-items: center; }
+.dlg .chkrow input { width: 17px; height: 17px; accent-color: var(--accent); }
+.dlg .derr { color: var(--bad); min-height: 22px; }
+.dlg .dacts { display: flex; flex-wrap: wrap; gap: 8px; }
+.dlg .dinfo { color: var(--ink-2); min-height: 24px; }
+.dlg .dbtns { display: flex; justify-content: flex-end; gap: 8px; }
+#toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 6px 16px; border-radius: 8px; max-width: min(92vw, 620px); box-shadow: var(--shadow); z-index: 70; text-align: center; }
+
+@media (max-width: 900px) {
+  .bar { position: static; }
+  .bar-in, main { padding-inline: 16px; }
+  .status { width: 100%; }
+  .actions .btn { flex: 1 1 auto; }
+  .head-fields { grid-template-columns: 1fr 1fr; }
+  .lower { grid-template-columns: minmax(0, 1fr); }
+  .scroll { overflow-x: visible; }
+  .grid, .grid.show-key { min-width: 0; }
+  .r.h { display: none; }
+  .r, .show-key .r { grid-template-columns: repeat(6, minmax(0, 1fr)); border-bottom: 6px solid var(--bg); }
+  .grid .r:last-child { border-bottom: 0; }
+  .c { border-right: 0; border-bottom: 1px solid var(--line); }
+  .c.no { grid-column: span 1; border-right: 1px solid var(--line); }
+  .c.ty { grid-column: span 2; border-right: 1px solid var(--line); }
+  .c.tl { grid-column: span 3; }
+  .c.st, .c.af, .c.en, .c.work, .c.rem, .c.key { grid-column: 1 / -1; }
+  .c[data-label]::before { display: block; content: attr(data-label); font-size: 19px; font-weight: 700; color: var(--ink-2); text-align: left; justify-self: start; }
+  .sign .two { grid-template-columns: 110px 1fr; }
+}
+@media (prefers-reduced-motion: no-preference) { .btn { transition: background-color .12s, filter .12s; } }
+</style>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="brand"><span class="unit">ฝูง.602 บน.6</span><h1>สภาพ บ.ประจำวัน</h1></div>
+    <span class="status" id="save-status" data-s="none" role="status">พร้อมกรอกข้อมูล</span>
+    <button type="button" class="btn small gs-chip" id="gs-chip" data-act="gs" hidden>Google Sheet</button>
+    <div class="actions">
+      <button type="button" class="btn" id="btn-hist" data-act="hist">ดูย้อนหลัง</button>
+      <button type="button" class="btn danger" id="btn-clear" data-act="clear">CLEAR</button>
+      <button type="button" class="btn" id="btn-preview" data-act="preview">PREVIEW</button>
+      <button type="button" class="btn" id="btn-pdf" data-act="pdf">PRINT TO PDF</button>
+      <button type="button" class="btn" id="btn-xlsx" data-act="xlsx">EXPORT TO EXCEL</button>
+      <button type="button" class="btn primary" id="btn-save" data-act="save">SAVE</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="note row" id="fy-note" role="status" hidden></div>
+  <div class="panel" id="panel-edit">
+    <section class="block">
+      <header><h2>หัวรายงาน</h2><span class="hint">สองบรรทัดบนสุดของแบบฟอร์ม</span></header>
+      <div class="body">
+        <div class="head-fields">
+          <label class="f"><span>ประจำวันที่ ตั้งแต่</span><input type="date" id="f-dateFrom" data-k="dateFrom"></label>
+          <label class="f"><span>ถึงวันที่</span><input type="date" id="f-dateTo" data-k="dateTo"></label>
+          <label class="f"><span>เมื่อเวลา</span><input type="text" id="f-time" data-k="time" class="num" inputmode="numeric" maxlength="5"></label>
+          <label class="f"><span>ก่อนหน้า (วัน)</span><input type="text" id="f-days" data-k="days" class="num" inputmode="numeric" maxlength="3"></label>
+        </div>
+        <div class="head-print" aria-live="polite"><div id="title1"></div><div id="title2"></div></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <header>
+        <h2>สภาพ บ. รายลำ</h2>
+        <div class="legend">
+          <span><span class="sw lock"></span>ล็อก แก้ไขไม่ได้</span>
+          <span><span class="sw edit"></span>ช่องกรอก</span>
+          <span><span class="sw grey"></span>ตัวเทา = ค่าที่ SAVE ครั้งล่าสุด</span>
+          <span class="meter" id="meter"></span>
+          <label class="switch"><input type="checkbox" id="toggle-key">แสดงคอลัมน์ K ที่ซ่อนไว้</label>
+        </div>
+      </header>
+      <div class="scroll"><div class="grid" id="grid"></div></div>
+      <footer><button type="button" class="btn small" data-act="addac">+ เพิ่มเครื่องบิน</button><span class="hint">ต้องใช้รหัสผ่าน และจะถูกเก็บเป็นค่าเริ่มต้นของครั้งถัดไป</span></footer>
+    </section>
+
+    <div class="lower">
+      <section class="block">
+        <header><h2>สรุปจำนวน บ. และ ชม.บิน</h2><span class="hint">กรอกตัวเลขหรือ - · เว้นว่าง = ไม่แสดง</span></header>
+        <div class="body sum-wrap"><table class="sum" id="sum"></table></div>
+        <footer><button type="button" class="btn small" data-act="addrow">+ เพิ่มรายการ (แถว)</button><button type="button" class="btn small" data-act="addcol">+ เพิ่ม บ.แบบ (คอลัมน์)</button><span class="hint">ต้องใช้รหัสผ่าน</span></footer>
+      </section>
+      <section class="block">
+        <header><h2>ผู้ลงนามรับทราบ</h2><span class="hint">บรรทัดที่ 1 คือ “ทราบแล้ว” · ชื่อและตำแหน่งใหม่เข้ารายการหลัง SAVE · กด × ในรายการเพื่อลบ มีผลเมื่อ SAVE · ตำแหน่งที่ยาวเกินจะพิมพ์เท่าที่พอ ให้ตบบรรทัดเอง</span></header>
+        <div class="body signs" id="signs"></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-preview" hidden>
+    <div class="pv-info">
+      <span class="meta" id="pv-meta">A4 แนวตั้ง</span>
+      <button type="button" class="btn" data-act="back">กลับไปแก้ไข</button>
+    </div>
+    <div class="note" id="pv-warn" hidden></div>
+    <div class="paper-wrap"><canvas id="paper" width="2480" height="3508" aria-label="ตัวอย่างหน้ากระดาษ A4 ของแบบฟอร์ม"></canvas></div>
+  </div>
+
+  <div class="panel" id="panel-saved" hidden>
+    <section class="block done">
+      <div class="body">
+        <p class="done-k">บันทึกสำเร็จ</p>
+        <h2 id="saved-line" tabindex="-1"></h2>
+        <p class="hint" id="saved-sub"></p>
+        <div class="gs-line" id="gs-line" role="status" hidden></div>
+        <div class="done-btns">
+          <button type="button" class="btn primary" data-act="spdf">PRINT TO PDF</button>
+          <button type="button" class="btn primary" data-act="sxlsx">EXPORT TO EXCEL</button>
+          <button type="button" class="btn" data-act="hist">ดูประวัติการบันทึกย้อนหลัง</button>
+          <button type="button" class="btn" data-act="back">กลับไปกรอกข้อมูล</button>
+        </div>
+        <p class="hint" id="saved-info" role="status"></p>
+      </div>
+    </section>
+    <div class="paper-wrap"><canvas id="paper2" class="paper" width="1654" height="2339" aria-label="หน้ากระดาษ A4 ของรายงานที่บันทึกแล้ว"></canvas></div>
+  </div>
+
+  <div class="panel" id="panel-hist" hidden>
+    <section class="block">
+      <header><h2>ประวัติการบันทึกย้อนหลัง</h2><span class="hint">ทุกครั้งที่ SAVE แสดงเป็นชื่อไฟล์ · กดชื่อไฟล์เพื่อเปิดดูหน้า PDF ในรูปแบบเดิมของวันที่บันทึก</span></header>
+      <div class="body">
+        <div class="hist-top">
+          <label class="f"><span>แหล่งข้อมูล</span><select id="h-src"></select></label>
+          <label class="f"><span>เดือนของรายงาน</span><select id="h-month"></select></label>
+          <button type="button" class="btn" data-act="hload">โหลดรายการใหม่</button>
+          <button type="button" class="btn" data-act="sdb">ดาวน์โหลด Excel Database</button>
+          <button type="button" class="btn" data-act="back">กลับไปกรอกข้อมูล</button>
+        </div>
+        <p class="hint" id="h-info" role="status"></p>
+        <div class="hist-list" id="h-list"></div>
+      </div>
+    </section>
+    <section class="block done" id="h-view" hidden>
+      <div class="body">
+        <h2 id="h-title" tabindex="-1"></h2>
+        <p class="hint" id="h-sub"></p>
+        <div class="done-btns">
+          <button type="button" class="btn primary" data-act="hpdf">PRINT TO PDF</button>
+          <button type="button" class="btn primary" data-act="hxlsx">EXPORT TO EXCEL</button>
+          <button type="button" class="btn" data-act="hedit">นำมาแก้ไข</button>
+          <button type="button" class="btn danger" data-act="hdel" id="h-del" hidden>ลบออกจากไฟล์ BACKUP</button>
+        </div>
+        <p class="hint" id="h-vinfo" role="status"></p>
+      </div>
+    </section>
+    <div class="paper-wrap" id="h-paper" hidden><canvas id="paper3" class="paper" width="1654" height="2339" aria-label="หน้ากระดาษ A4 ของรายงานย้อนหลัง"></canvas></div>
+  </div>
+</main>
+
+<dialog id="dlg"></dialog>
+<div id="pop" role="listbox" hidden></div>
+<div id="toast" role="status" hidden></div>
+
+<script>
+(() => {
+'use strict';
+
+/* ====================== fixed definitions ====================== */
+const PROFILES = {
+  'บ.ล.15':   { eng: 2, heavy: '36M-CHECK', checks: ['6M-CHECK', '12M-CHECK', '18M-CHECK', '24M-CHECK', '36M-CHECK'] },
+  'บ.ล.15 ก': { eng: 2, heavy: '36M-CHECK', checks: ['6M-CHECK', '12M-CHECK', '18M-CHECK', '24M-CHECK', '36M-CHECK'] },
+  'บ.ล.19':   { eng: 4, heavy: '24M-CHECK', checks: ['6M-CHECK', '12M-CHECK', '18M-CHECK', '24M-CHECK'] },
+  'บ.ล.18':   { eng: 2, heavy: '48M-CHECK', checks: ['3M-CHECK', '6M-CHECK', '9M-CHECK', '12M-CHECK', '15M-CHECK', '18M-CHECK', '21M-CHECK', '24M-CHECK', '48M-CHECK'] },
+};
+const COMMON_CHECKS = ['A/C PRESERVATION', 'HANGAR QUEEN'];
+const STATUS = ['FMC', 'PMC', 'NMCM', 'NMCS', 'NMCB'];
+const RANKS = ['พล.อ.อ.', 'พล.อ.ท.', 'พล.อ.ต.', 'น.อ.', 'น.ท.', 'น.ต.', 'ร.อ.', 'ร.ท.', 'ร.ต.', 'พ.อ.อ.', 'พ.อ.ท.', 'พ.อ.ต.', 'จ.อ.', 'จ.ท.', 'จ.ต.', 'พลฯ', 'นนอ.', 'นจอ.'];
+const MON = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+const MON_EN = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+const FLOOR0 = { a319: 10, a320_03: 5, a320_05: 2, a340_04: 10 };   // highest C-check already done, per aircraft
+const PASS = { admin: __HASH_ADMIN__, hours: __HASH_HOURS__, sheet: __HASH_SHEET__ };
+const LS = 'daily-ac-status-602:v2:';
+const MAX_SUM_COLS = 5;
+
+function defaultConfig() {
+  const ac = (id, type, tail, serial, key) => ({ id, type, tail, serial, key, eng: PROFILES[type].eng, profile: type, builtin: true });
+  const row = (id, label, extra) => Object.assign({ id, label, builtin: true }, extra || {});
+  return {
+    v: 2,
+    aircraft: [
+      ac('a319', 'บ.ล.15', '1/47', '60202', 'A319'),
+      ac('a320_03', 'บ.ล.15 ก', '1/58', '60203', 'A320 (03)'),
+      ac('a320_05', 'บ.ล.15 ก', '2/63', '60205', 'A320 (05)'),
+      ac('a340_04', 'บ.ล.19', '1/59', '60204', 'A340 (04)'),
+      ac('ssj_06', 'บ.ล.18', '1/59', '60206', 'SSJ100LR (06)'),
+      ac('ssj_07', 'บ.ล.18', '2/59', '60207', 'SSJ100LR (07)'),
+      ac('ssj_08', 'บ.ล.18', '3/61', '60208', 'SSJ100LR (08)'),
+    ],
+    sumCols: [{ id: 'c1', label: 'บ.ล.15/ก', builtin: true }, { id: 'c2', label: 'บ.ล.19', builtin: true }, { id: 'c3', label: 'บ.ล.18', builtin: true }],
+    sumRows: [
+      row('assigned', 'จำนวน บ. ที่บรรจุ'), row('possessed', 'จำนวน บ. ที่ครอบครอง'), row('depot', 'บ. ที่ ชอ.รับผิดชอบ'),
+      row('flyable', 'บ. ที่บินได้'), row('noparts', 'บ. ขาดชิ้นอะไหล่'), row('repair', 'บ. ทำการตรวจซ่อมที่ บกท., TAI, ฝกช.'),
+      row('abroad', 'บ. ราชการต่างประเทศ'), row('h24', 'ชม.บินภายใน 24 ชม.ที่แล้ว'),
+      row('m1', 'ชม.บินภารกิจเดโชชัย', { sum: true }), row('m2', 'ชม.บินภารกิจสำนักนายก', { sum: true }),
+      row('m3', 'ชม.บินภารกิจ ทอ.', { sum: true }), row('m4', 'ชม.บินฝึก', { sum: true }),
+      row('month', 'ชม.บินรวมในเดือน', { dyn: 'month', total: true }), row('monthAppr', 'ชม.บินรวมอนุมัติต่อเดือน'),
+      row('fy', 'ชม.บินรวมในปีงบประมาณ', { dyn: 'fy' }), row('fyAppr', 'ชม.บินรวมอนุมัติต่อปีงบประมาณ'),
+    ],
+    signers: { 0: { names: [], pos: [] }, 1: { names: [], pos: [] } },
+  };
+}
+
+/* ====================== small helpers ====================== */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const str = (v) => (v == null ? '' : String(v));
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const isNum = (s) => /^\d+(\.\d+)?$/.test(String(s).trim());
+const thaiNum = (s) => String(s).replace(/\d/g, (c) => '๐๑๒๓๔๕๖๗๘๙'[c]);
+const arabic = (s) => String(s).replace(/[๐-๙]/g, (c) => '๐๑๒๓๔๕๖๗๘๙'.indexOf(c));
+const pad2 = (n) => String(n).padStart(2, '0');
+const lines = (v) => { const a = Array.isArray(v) ? v.map(str) : (typeof v === 'string' && v ? v.split('\n') : []); return a.length ? a : ['']; };
+const trimTail = (arr) => { const a = arr.map((x) => str(x).replace(/\s+$/, '')); while (a.length && a[a.length - 1] === '') a.pop(); return a; };
+function h53(s) {
+  let h1 = 0xdeadbeef ^ 7, h2 = 0x41c6ce57 ^ 7;
+  for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+}
+const passOk = (kind, v) => h53('602:' + str(v).trim().toUpperCase()) === PASS[kind];
+function thNow() { return new Date(Date.now() + 7 * 3600e3); }                      // read with getUTC*: Thai local time
+function todayTH() { const t = thNow(); return t.getUTCFullYear() + '-' + pad2(t.getUTCMonth() + 1) + '-' + pad2(t.getUTCDate()); }
+function lsGet(k) { try { const raw = localStorage.getItem(LS + k); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
+function lsSet(k, v) { try { if (v == null) localStorage.removeItem(LS + k); else localStorage.setItem(LS + k, JSON.stringify(v)); } catch (e) { /* storage unavailable: the page still works */ } }
+
+/* ====================== state ====================== */
+let config, saved, work, approvals = {}, touched = false;
+let sheets = { v: 3, files: {}, backups: {}, pending: [], bpending: [], parked: {}, bgone: {}, carry: {} };            // Google Sheet file of each fiscal year, and saves not yet sent there
+const newPend = () => ({ n0: [], n1: [], p0: [], p1: [] });
+let pend = newPend();                                      // signer names / positions marked for removal at the next SAVE
+
+function normConfig(o) {
+  const d = defaultConfig(), src = (o && typeof o === 'object') ? o : {};
+  const c = { v: 2, aircraft: [], sumCols: [], sumRows: [], signers: { 0: { names: [], pos: [] }, 1: { names: [], pos: [] } } };
+  const seen = {};
+  const idOk = (id) => /^[A-Za-z0-9_]+$/.test(str(id)) && !seen[id] && (seen[id] = 1);
+  const part = (k) => ((Array.isArray(src[k]) && src[k].length) ? src[k] : d[k]);
+  part('aircraft').forEach((a) => {
+    if (!a || !idOk(a.id)) return;
+    c.aircraft.push({ id: a.id, type: str(a.type), tail: str(a.tail), serial: str(a.serial), key: str(a.key), eng: Math.min(8, Math.max(1, Math.round(+a.eng) || 2)), profile: str(a.profile), builtin: !!a.builtin });
+  });
+  part('sumCols').forEach((x) => { if (x && idOk(x.id)) c.sumCols.push({ id: x.id, label: str(x.label), builtin: !!x.builtin }); });
+  part('sumRows').forEach((x) => { if (x && idOk(x.id)) c.sumRows.push({ id: x.id, label: str(x.label), builtin: !!x.builtin, sum: !!x.sum, total: !!x.total, dyn: str(x.dyn) }); });
+  for (let i = 0; i < 2; i++) {
+    // each name keeps the rank and position lines last saved with it; an older stored list of name sets is carried over
+    const sg = src.signers && src.signers[i], old = (!sg && src.presets && Array.isArray(src.presets[i])) ? src.presets[i] : [];
+    const names = [], pos = [];
+    ((sg && Array.isArray(sg.names)) ? sg.names : old).forEach((q) => {
+      const name = q ? str(q.name).trim() : '';
+      if (name && !names.some((x) => x.name === name)) names.push({ name, rank: str(q.rank).trim(), pos: trimTail(lines(q.pos)).map((x) => x.trim()).filter(Boolean) });
+    });
+    ((sg && Array.isArray(sg.pos)) ? sg.pos : [].concat(...names.map((q) => q.pos))).forEach((v) => { v = str(v).trim(); if (v && !pos.includes(v)) pos.push(v); });
+    c.signers[i] = { names, pos };
+  }
+  return c;
+}
+function normReport(o) {
+  o = (o && typeof o === 'object') ? o : {};
+  const r = { dateFrom: str(o.dateFrom), dateTo: str(o.dateTo), time: str(o.time), days: str(o.days), ac: {}, sum: {}, sign: [] };
+  for (const a of config.aircraft) {
+    const x = (o.ac && o.ac[a.id]) || {};
+    const arr = (v) => Array.from({ length: a.eng }, (_, i) => str(Array.isArray(v) ? v[i] : ''));
+    r.ac[a.id] = { mark: str(x.mark), status: str(x.status), sched: str(x.sched), af: str(x.af), eng: arr(x.eng), sn: arr(x.sn), work: lines(x.work), check: str(x.check), cnum: str(x.cnum), from: str(x.from), to: str(x.to), notes: lines(x.notes) };
+  }
+  for (const row of config.sumRows) {
+    r.sum[row.id] = {};
+    for (const col of config.sumCols) r.sum[row.id][col.id] = row.total ? '' : str(((o.sum || {})[row.id] || {})[col.id]);
+  }
+  for (let i = 0; i < 2; i++) {
+    const x = (o.sign && o.sign[i]) || {};
+    r.sign.push({ rank: str(x.rank), name: str(x.name), pos: lines(x.pos), day: str(x.day), month: str(x.month), year: str(x.year) });
+  }
+  return r;
+}
+function blankReport(fresh) {
+  const r = normReport({});
+  r.dateFrom = r.dateTo = todayTH(); if (fresh) { r.time = '1500'; r.days = '1'; }
+  return r;
+}
+function normState(o) {
+  o = (o && typeof o === 'object') ? o : {};
+  const s = { v: 2, report: o.report ? normReport(o.report) : null, eng: [], heavy: {}, revs: {}, meta: { savedAt: '' } };
+  (Array.isArray(o.eng) ? o.eng : []).forEach((e) => { if (e && str(e.sn).trim()) s.eng.push({ sn: str(e.sn).trim(), h: str(e.h) }); });
+  for (const a of config.aircraft) {
+    const h = (o.heavy && o.heavy[a.id]) || {};
+    s.heavy[a.id] = { floor: Math.max(0, Math.round(+h.floor) || 0) || (o.heavy && o.heavy[a.id] ? 0 : (FLOOR0[a.id] || 0)), n: Math.max(0, Math.round(+h.n) || 0), to: str(h.to) };
+  }
+  if (o.meta) s.meta = { savedAt: str(o.meta.savedAt) };
+  // revs: how many times each report (keyed by its start date) has been saved
+  if (o.revs && typeof o.revs === 'object') for (const d in o.revs) { const n = Math.round(+o.revs[d]) || 0; if (parseISO(d) && n > 0) s.revs[d] = n; }
+  return s;
+}
+function tidyReport(r) {
+  const t = clone(r);
+  for (const id in t.ac) { const s = t.ac[id]; s.work = lines(trimTail(s.work)); s.notes = lines(trimTail(s.notes)); for (const f of ['mark', 'status', 'sched', 'af', 'check', 'cnum']) s[f] = s[f].trim(); s.eng = s.eng.map((x) => x.trim()); s.sn = s.sn.map((x) => x.trim()); if (s.check !== heavyOf(acById(id))) s.cnum = ''; }
+  t.sign.forEach((g) => { g.pos = lines(trimTail(g.pos)); });
+  return t;
+}
+function getPath(root, k) { return k.split('.').reduce((o, p) => (o == null ? o : o[p]), root); }
+function setPath(root, k, v) { const p = k.split('.'); let o = root; for (let i = 0; i < p.length - 1; i++) o = o[p[i]]; o[p[p.length - 1]] = v; }
+const acById = (id) => config.aircraft.find((a) => a.id === id);
+const who = (a) => a.tail + ' (' + a.serial + ')';
+const pid = (k) => k.replace(/\./g, '-');
+
+/* ====================== dates and derived text ====================== */
+function parseISO(s) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); return m ? { y: +m[1], m: +m[2], d: +m[3], t: Date.UTC(+m[1], +m[2] - 1, +m[3]) } : null; }
+const yy = (d) => pad2((d.y + 543) % 100);
+const dFull = (d) => d.d + ' ' + MON[d.m - 1] + yy(d);
+function fmtRange(fromISO, toISO) {
+  const a = parseISO(fromISO), b = parseISO(toISO);
+  if (a && b) {
+    if (a.t === b.t) return dFull(a);
+    if (a.y === b.y && a.m === b.m) return a.d + ' - ' + dFull(b);
+    if (a.y === b.y) return a.d + ' ' + MON[a.m - 1] + ' - ' + dFull(b);
+    return dFull(a) + ' - ' + dFull(b);
+  }
+  if (a) return 'ตั้งแต่ ' + dFull(a);
+  if (b) return 'ถึง ' + dFull(b);
+  return '';
+}
+const refDate = (r) => parseISO(r.dateFrom) || parseISO(r.dateTo) || parseISO(todayTH());   // the start date leads when a report spans months
+const autoMonth = (r) => MON[refDate(r).m - 1];
+const autoYear = (r) => thaiNum(yy(refDate(r)));
+const fiscalYear = (r) => { const d = refDate(r); return pad2((d.y + 543 + (d.m >= 10 ? 1 : 0)) % 100); };
+const title1 = (r, rev) => 'รายงานสถานภาพ บ.ของ ฝูง.602 บน.6 ประจำวันที่ ' + fmtRange(r.dateFrom, r.dateTo) + (rev > 0 ? ' (แก้ไขครั้งที่' + rev + ')' : '');
+// "ถึงวันที่" is the start date or any day after it, never earlier
+const toOk = (r) => { const a = parseISO(r.dateFrom), b = parseISO(r.dateTo); return !!(a && b && b.t >= a.t); };
+const title2 = (r) => 'สถานภาพ บ.เมื่อเวลา ' + r.time.trim() + ' ก่อนหน้า ' + r.days.trim() + ' วัน';
+const rowLabel = (row, r) => row.label + (row.dyn === 'month' ? ' ' + autoMonth(r) + yy(refDate(r)) : row.dyn === 'fy' ? ' ' + fiscalYear(r) : '');
+const signDay = (g) => { const d = arabic(g.day).replace(/\D/g, ''); return d ? thaiNum(String(+d)) : ''; };
+const signMY = (g, r) => (g.month || autoMonth(r)) + (g.year || autoYear(r));
+function sumTotal(r, colId) {
+  let t = 0;
+  for (const row of config.sumRows) if (row.sum) { const v = str(r.sum[row.id][colId]).trim(); if (isNum(v)) t += Number(v); }
+  return t.toFixed(1);
+}
+const sumValue = (r, row, colId) => (row.total ? sumTotal(r, colId) : str(r.sum[row.id][colId]).trim());
+
+/* ====================== CHECK rules ====================== */
+const profOf = (a) => PROFILES[a.profile] || null;
+const heavyOf = (a) => { const p = a && profOf(a); return p ? p.heavy : ''; };
+const profChecks = (a) => { const p = profOf(a); return p ? p.checks : []; };
+const dateFree = (name) => COMMON_CHECKS.includes(name);
+const checkText = (a, s) => { const c = s.check.trim(); return (c && c === heavyOf(a) && s.cnum) ? 'C' + s.cnum + '-CHECK' : c; };
+function lockedMax(id) { const h = saved.heavy[id] || { floor: 0, n: 0, to: '' }; return Math.max(h.floor || 0, (h.n && h.to && h.to < todayTH()) ? h.n : 0); }
+// grey example for the CHECK field: once the saved CHECK's end date has passed, the next one in the list
+function nextHint(a) {
+  const s = saved.report && saved.report.ac[a.id];
+  if (!s || !s.check) return { check: '', cnum: '' };
+  const list = profChecks(a), i = list.indexOf(s.check);
+  if (i >= 0 && s.to && s.to < todayTH()) { const nx = list[(i + 1) % list.length]; return { check: nx, cnum: nx === heavyOf(a) ? String(lockedMax(a.id) + 1) : '', next: true }; }
+  return { check: s.check, cnum: s.cnum };
+}
+function cHint(a) { const h = nextHint(a); return (h.check === heavyOf(a) && h.cnum) ? h.cnum : String(Math.min(99, lockedMax(a.id) + 1)); }
+
+/* ====================== hour baselines ====================== */
+function afBase(id) { const s = saved.report && saved.report.ac[id]; return (s && isNum(s.af)) ? Number(s.af) : null; }
+function engBaseStr(id, i) {
+  const sv = saved.report && saved.report.ac[id], svSn = sv ? sv.sn[i].trim() : '', svH = sv ? sv.eng[i].trim() : '';
+  const sn = work.ac[id].sn[i].trim();
+  if (!sn) return svH;                                    // number not typed yet: this position's last saved hours
+  const hist = saved.eng.find((e) => e.sn === sn);
+  if (hist) return hist.h;                                // a known engine keeps its own history wherever it is fitted
+  return svSn === '' ? svH : '';                          // first time this position gets a number, or a never-seen engine
+}
+function engBase(id, i) { const b = engBaseStr(id, i); return isNum(b) ? Number(b) : null; }
+
+/* ====================== editor: building ====================== */
+const LOCK = '<span class="lockmark"><svg viewBox="0 0 12 12" aria-hidden="true"><path fill="currentColor" d="M3.5 5V3.7a2.5 2.5 0 0 1 5 0V5h.6c.5 0 .9.4.9.9v4.2c0 .5-.4.9-.9.9H2.9a.9.9 0 0 1-.9-.9V5.9c0-.5.4-.9.9-.9h.6Zm1.2 0h2.6V3.7a1.3 1.3 0 0 0-2.6 0V5Z"/></svg>ล็อก</span>';
+const combo = (attrs) => '<span class="cb"><input type="text" autocomplete="off" ' + attrs + '></span>';
+
+function linesHTML(path, label) {
+  const arr = getPath(work, path);
+  return arr.map((_, i) => '<div class="ln"><input type="text" autocomplete="off" id="f-' + pid(path) + '-' + i + '" data-k="' + path + '.' + i + '" data-line="' + path + '" aria-label="' + esc(label) + ' บรรทัดที่ ' + (i + 1) + '">'
+    + '<button type="button" class="ic" data-act="rmline" data-path="' + path + '" data-i="' + i + '" aria-label="ลบบรรทัดที่ ' + (i + 1) + '" title="ลบบรรทัดนี้">×</button></div>').join('')
+    + '<div><button type="button" class="btn quiet" data-act="addline" data-path="' + path + '">+ เพิ่มบรรทัด</button></div>';
+}
+
+function buildGrid() {
+  let h = '<div class="r h">'
+    + '<div class="c"><span class="col-tag">A</span>ลำดับ' + LOCK + '</div>'
+    + '<div class="c"><span class="col-tag">B</span>บ.แบบ' + LOCK + '</div>'
+    + '<div class="c"><span class="col-tag">C</span>หมายเลข' + LOCK + '</div>'
+    + '<div class="c"><span class="col-tag">D–E</span>สถานภาพ</div>'
+    + '<div class="c"><span class="col-tag">F</span>เวลา บ.<small>ต้องไม่น้อยกว่าครั้งก่อน</small></div>'
+    + '<div class="c"><span class="col-tag">G</span>เวลา ย. และหมายเลขเครื่องยนต์<small>หมายเลข ย. ไม่พิมพ์ลงแบบฟอร์ม</small></div>'
+    + '<div class="c"><span class="col-tag">H–I</span>การปฏิบัติและข้อขัดข้อง<small>ขึ้นต้นด้วยเลขข้อ = ชิดซ้าย · นอกนั้นกึ่งกลาง · ช่องสีครีมกรอบแดง = ข้อความยาวเกินไป ตอนพิมพ์จะย่อตัวอักษรเฉพาะบรรทัดนั้นให้พอดี (ไม่ต่ำกว่า 8 pt)</small></div>'
+    + '<div class="c rem"><span class="col-tag">J</span>หมายเหตุ<small>ชื่อการเข้า CHECK · ระยะเวลา · หมายเหตุอื่นๆ · ข้อความยาวจะย่อตัวอักษรให้พอดี (ไม่ต่ำกว่า 8 pt)</small></div>'
+    + '<div class="c key"><span class="col-tag">K</span>รหัส บ.<small>ซ่อนไว้ ไม่พิมพ์ลง PDF</small>' + LOCK + '</div>'
+    + '</div>';
+  config.aircraft.forEach((a, idx) => {
+    const p = 'ac.' + a.id + '.', id = 'f-' + a.id + '-', w = esc(a.type + ' ' + a.tail);
+    let eng = '';
+    for (let i = 0; i < a.eng; i++) {
+      eng += '<div class="eng"><span>ENG.' + (i + 1) + '</span><input type="text" autocomplete="off" class="num" inputmode="decimal" data-san="num" id="' + id + 'eng' + i + '" data-k="' + p + 'eng.' + i + '" aria-label="เวลา ย. ENG.' + (i + 1) + ' ' + w + '">'
+        + '<span>S/N</span><input type="text" autocomplete="off" id="' + id + 'sn' + i + '" data-k="' + p + 'sn.' + i + '" aria-label="หมายเลขเครื่องยนต์ ENG.' + (i + 1) + ' ' + w + '"></div>';
+    }
+    h += '<div class="r" data-ac="' + a.id + '">'
+      + '<div class="c lock no" data-label="ลำดับ"><b>' + (idx + 1) + '</b>' + (a.builtin ? '' : '<button type="button" class="btn quiet" data-act="rmac" data-id="' + a.id + '">ลบ</button>') + '</div>'
+      + '<div class="c lock ty" data-label="บ.แบบ">' + esc(a.type) + '</div>'
+      + '<div class="c lock tl" data-label="หมายเลข"><span>' + esc(a.tail) + '</span><span>(' + esc(a.serial) + ')</span></div>'
+      + '<div class="c st" data-label="สถานภาพ"><div class="st-top">'
+        + combo('class="num" maxlength="3" data-c="mark" id="' + id + 'mark" data-k="' + p + 'mark" aria-label="เครื่องหมายสถานภาพ ' + w + '"')
+        + combo('readonly data-c="status" id="' + id + 'status" data-k="' + p + 'status" aria-label="สถานภาพ ' + w + '"') + '</div>'
+        + combo('data-c="sched" id="' + id + 'sched" data-k="' + p + 'sched" aria-label="SCHEDULE หรือ UNSCHEDULE ' + w + '"') + '</div>'
+      + '<div class="c af" data-label="เวลา บ."><input type="text" autocomplete="off" class="num" inputmode="decimal" data-san="num" id="' + id + 'af" data-k="' + p + 'af" aria-label="เวลา บ. ' + w + '"></div>'
+      + '<div class="c en" data-label="เวลา ย. และหมายเลขเครื่องยนต์">' + eng + '</div>'
+      + '<div class="c work" data-label="การปฏิบัติและข้อขัดข้อง"><div class="lines" id="L-' + pid(p + 'work') + '">' + linesHTML(p + 'work', 'ข้อขัดข้อง ' + a.type + ' ' + a.tail) + '</div></div>'
+      + '<div class="c rem" data-label="หมายเหตุ">'
+        + '<div class="rem-line"><label class="lab" for="' + id + 'check">ชื่อการเข้า CHECK</label><div class="chk" id="chk-' + a.id + '">'
+          + combo('data-c="check" id="' + id + 'check" data-k="' + p + 'check" autocapitalize="characters"')
+          + '<span class="cb" id="cw-' + a.id + '" hidden><input type="text" readonly data-c="cnum" class="num" id="' + id + 'cnum" data-k="' + p + 'cnum" aria-label="เลขครั้งที่เข้าซ่อมบำรุงใหญ่ ' + w + '"></span></div></div>'
+        + '<div class="rem-line"><span class="lab">ระยะเวลาซ่อมบำรุง</span><div class="range">'
+          + '<label>ตั้งแต่<input type="date" id="' + id + 'from" data-k="' + p + 'from" aria-label="เริ่มซ่อมบำรุง ' + w + '"></label>'
+          + '<label>ถึง<input type="date" id="' + id + 'to" data-k="' + p + 'to" aria-label="สิ้นสุดซ่อมบำรุง ' + w + '"></label></div>'
+          + '<div class="out" id="per-' + a.id + '"></div></div>'
+        + '<div class="rem-line"><span class="lab">หมายเหตุอื่นๆ</span><div class="lines" id="L-' + pid(p + 'notes') + '">' + linesHTML(p + 'notes', 'หมายเหตุ ' + a.type + ' ' + a.tail) + '</div></div>'
+      + '</div>'
+      + '<div class="c lock key" data-label="รหัส บ. (คอลัมน์ K ที่ซ่อน)"><span class="keyv">' + esc(a.key) + '</span></div>'
+      + '</div>';
+  });
+  $('grid').innerHTML = h;
+  fitGrid();
+}
+// the aircraft table keeps its column layout and is scaled down to the width there is, so it never scrolls sideways
+function fitGrid() {
+  const g = $('grid'), box = g.parentNode;
+  g.style.zoom = '';
+  if (window.matchMedia('(max-width: 900px)').matches) return;          // the stacked phone layout fits by itself
+  const need = Math.max(g.scrollWidth, box.scrollWidth), have = box.clientWidth;        // measured at full size: what the columns really take
+  if (have > 0 && need > have) g.style.zoom = String(Math.floor(have / need * 1000) / 1000);
+}
+function fitSum() {
+  const t = $('sum'), box = t.parentNode;
+  t.style.zoom = '';
+  const have = box.clientWidth;
+  let z = 1;
+  for (let i = 0; i < 4 && have > 0 && box.scrollWidth > have; i++) { z = Math.floor(z * have / box.scrollWidth * 1000) / 1000; t.style.zoom = String(z); }   // a table does not shrink exactly in step, so look again
+}
+if (typeof ResizeObserver === 'function') { new ResizeObserver(() => fitGrid()).observe($('grid').parentNode); new ResizeObserver(() => fitSum()).observe($('sum').parentNode); }
+else window.addEventListener('resize', () => { fitGrid(); fitSum(); });
+
+function buildSum() {
+  let h = '<thead><tr><th scope="col">บ.แบบ</th>' + config.sumCols.map((c) => '<th scope="col">' + esc(c.label)
+    + (c.builtin ? '' : ' <button type="button" class="ic" data-act="rmcol" data-id="' + c.id + '" aria-label="ลบคอลัมน์ ' + esc(c.label) + '" title="ลบคอลัมน์นี้">×</button>') + '</th>').join('') + '</tr></thead><tbody>';
+  config.sumRows.forEach((row, i) => {
+    h += '<tr><th scope="row"><div class="rl">'
+      + '<button type="button" class="ic mv" data-act="rowup" data-i="' + i + '" aria-label="เลื่อนขึ้น" title="เลื่อนขึ้น"' + (i === 0 ? ' disabled' : '') + '>▲</button>'
+      + '<button type="button" class="ic mv" data-act="rowdown" data-i="' + i + '" aria-label="เลื่อนลง" title="เลื่อนลง"' + (i === config.sumRows.length - 1 ? ' disabled' : '') + '>▼</button>'
+      + '<span id="sl-' + row.id + '"></span>'
+      + (row.builtin ? '' : '<button type="button" class="ic" data-act="rmrow" data-id="' + row.id + '" aria-label="ลบรายการนี้" title="ลบรายการนี้">×</button>') + '</div></th>';
+    for (const col of config.sumCols) {
+      h += row.total ? '<td class="calc" id="tot-' + col.id + '" title="คำนวณจากสูตร แก้ไขเองไม่ได้"></td>'
+        : '<td><input type="text" autocomplete="off" class="num" inputmode="decimal" data-san="sum" id="f-sum-' + row.id + '-' + col.id + '" data-k="sum.' + row.id + '.' + col.id + '" aria-label="' + esc(row.label + ' ' + col.label) + '"></td>';
+    }
+    h += '</tr>';
+  });
+  $('sum').innerHTML = h + '</tbody>';
+  fitSum();
+}
+
+function buildSigns() {
+  let h = '';
+  for (let i = 0; i < 2; i++) {
+    const id = 'f-sign' + i + '-', p = 'sign.' + i + '.';
+    h += '<div class="sign"><h3>ผู้ลงนามคนที่ ' + (i + 1) + '</h3>'
+      + '<div class="two"><label class="f"><span>บรรทัดที่ 2 · ยศ</span>' + combo('data-c="rank" id="' + id + 'rank" data-k="' + p + 'rank"') + '</label>'
+      + '<label class="f"><span>บรรทัดที่ 3 · ชื่อ – สกุล (ในวงเล็บ)</span>' + combo('data-c="sname" id="' + id + 'name" data-k="' + p + 'name"') + '</label></div>'
+      + '<div class="rem-line"><span class="lab">บรรทัดที่ 4 เป็นต้นไป · ตำแหน่ง (หนึ่งช่อง = หนึ่งบรรทัด)</span><div class="lines" id="L-' + pid(p + 'pos') + '">' + linesHTML(p + 'pos', 'ตำแหน่งผู้ลงนามคนที่ ' + (i + 1)) + '</div></div>'
+      + '<div class="three"><label class="f"><span>บรรทัดสุดท้าย · วันที่ (เว้นว่างได้)</span><input type="text" autocomplete="off" class="num" inputmode="numeric" maxlength="2" data-san="day" id="' + id + 'day" data-k="' + p + 'day"></label>'
+      + '<label class="f"><span>เดือน</span>' + combo('readonly data-c="month" id="' + id + 'month" data-k="' + p + 'month"') + '</label>'
+      + '<label class="f"><span>ปี พ.ศ.</span>' + combo('readonly class="num" data-c="year" id="' + id + 'year" data-k="' + p + 'year"') + '</label></div>'
+      + '</div>';
+  }
+  $('signs').innerHTML = h;
+}
+
+/* ====================== editor: values, grey examples, derived text ====================== */
+function phFor(k) {
+  const p = k.split('.');
+  if (p[0] === 'sign' && p[2] === 'month') return autoMonth(work);
+  if (p[0] === 'sign' && p[2] === 'year') return autoYear(work);
+  if (k === 'dateFrom' || k === 'dateTo') return '';
+  const sr = saved.report;
+  if (p[0] === 'ac') {
+    const a = acById(p[1]);
+    if (!a) return '';
+    if (p[2] === 'cnum') return cHint(a);
+    if (!sr) return '';
+    if (p[2] === 'check') return nextHint(a).check;
+    if (p[2] === 'eng') return engBaseStr(a.id, +p[3]);
+  }
+  return sr ? str(getPath(sr, k)) : '';
+}
+function fill(root) {
+  (root || document).querySelectorAll('[data-k]').forEach((el) => { el.value = str(getPath(work, el.dataset.k)); if (el.type !== 'date') el.placeholder = phFor(el.dataset.k); });
+}
+function renderAll() { buildGrid(); buildSum(); buildSigns(); fill(); refresh(); }
+function renderList(path, focusIndex) {
+  const box = $('L-' + pid(path)), first = box.querySelector('input');
+  box.innerHTML = linesHTML(path, first ? first.getAttribute('aria-label').replace(/ บรรทัดที่ \d+$/, '') : '');
+  fill(box);
+  if (focusIndex != null) { const el = $('f-' + pid(path) + '-' + focusIndex); if (el) el.focus(); }
+}
+const PT = 25.4 / 72, FONT_MM = 12 * PT;
+const DOC_FONT = '"TH SarabunPSK","TH Sarabun New","Leelawadee UI",Tahoma,sans-serif';
+const mctx = document.createElement('canvas').getContext('2d');
+// Text widths. Safari draws centred and right-aligned Thai text from the anchor point, as if it had no width, so the
+// page aligns nothing through the canvas: every string is drawn from its left edge, at an x worked out from the width
+// found here. The canvas's own measurement is used while it agrees with the advance widths in the font file (it also
+// counts kerning, which only ever narrows a string a little); a browser whose figure is off gets the font's own.
+const ADV = __FONT_ADV__;                                  // advance widths of the embedded TH SarabunPSK, in 1/1000 em
+let sarabunUp = false;
+function sarabunReady() {
+  if (sarabunUp) return true;
+  try { sarabunUp = document.fonts.check('400 20px "TH SarabunPSK"', 'ก A') && document.fonts.check('700 20px "TH SarabunPSK"', 'ก A'); } catch (e) { sarabunUp = false; }
+  return sarabunUp;
+}
+function advEm(s, bold) {
+  const t = bold ? ADV.b : ADV.r;
+  let w = 0;
+  for (let i = 0; i < s.length; i++) { const a = t[s.charCodeAt(i)]; if (a === undefined) return -1; w += a; }
+  return w / 1000;
+}
+function textWidth(c, s, px, bold) {                       // c.font is already this weight at px
+  const m = c.measureText(s).width;
+  if (!sarabunReady()) return m;
+  const e = advEm(s, bold) * px;
+  return e < 0 || (m >= e * 0.88 && m <= e * 1.03) ? m : e;
+}
+function measureMM(s, bold) { const px = FONT_MM * 10; mctx.font = (bold ? '700 ' : '400 ') + px + 'px ' + DOC_FONT; return textWidth(mctx, s, px, !!bold) / 10; }
+
+const wider = (l, room) => measureMM(str(l).trim()) > room;
+function flagLong(el, over) {
+  if (!el) return;
+  el.classList.toggle('over', over);
+  if (el.parentNode.matches('.ln, .cb')) el.parentNode.classList.toggle('over', over);       // the wrapper shows the "ข้อความยาวเกินไป" popup
+  if (over) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
+}
+function refresh() {
+  $('title1').textContent = title1(work, curRev());
+  { const a = parseISO(work.dateFrom), el = $('f-dateTo'); el.min = a ? work.dateFrom : ''; }
+  $('title2').textContent = title2(work);
+  for (const a of config.aircraft) {
+    const s = work.ac[a.id], sv = saved.report && saved.report.ac[a.id], heavy = s.check.trim() !== '' && s.check.trim() === heavyOf(a);
+    $('cw-' + a.id).hidden = !heavy;
+    $('chk-' + a.id).classList.toggle('heavy', heavy);
+    const txt = fmtRange(s.from, s.to), f = parseISO(s.from), t = parseISO(s.to), box = $('per-' + a.id);
+    let h = '';
+    if (txt) {
+      h = 'พิมพ์เป็น <b>' + esc(txt) + '</b>';
+      if (f && t && t.t < f.t) h += '<span class="err">วันสิ้นสุดอยู่ก่อนวันเริ่ม</span>';
+      h += '<button type="button" class="btn quiet" data-act="cleardates" data-id="' + a.id + '">ล้างวันที่</button>';
+    } else if (sv && (sv.from || sv.to)) {
+      h = '<span class="grey">' + esc(fmtRange(sv.from, sv.to)) + '</span><button type="button" class="btn quiet" data-act="lastdates" data-id="' + a.id + '">ใช้ค่านี้</button>';
+    }
+    if (heavy && s.cnum) h += '<span>พิมพ์ชื่อเป็น <b>C' + esc(s.cnum) + '-CHECK</b></span>';
+    box.innerHTML = h;
+    for (let i = 0; i < a.eng; i++) $('f-' + a.id + '-eng' + i).placeholder = engBaseStr(a.id, i);
+    s.work.forEach((l, i) => flagLong($('f-' + pid('ac.' + a.id + '.work') + '-' + i), wider(l, COL[7] - 2 * PAD)));
+    // the two listed choices are wider than column E and are printed smaller to fit, as the workbook does: they are not marked
+    flagLong($('f-' + a.id + '-sched'), !SCHED_LIST.includes(s.sched.trim()) && wider(s.sched, COL[4] - 1));
+    flagLong($('f-' + a.id + '-check'), wider(checkText(a, s), COL[8] - 2 * PAD));
+    s.notes.forEach((l, i) => flagLong($('f-' + pid('ac.' + a.id + '.notes') + '-' + i), wider(l, COL[8] - 2 * PAD)));
+  }
+  for (const row of config.sumRows) $('sl-' + row.id).textContent = rowLabel(row, work);
+  for (const col of config.sumCols) { const el = $('tot-' + col.id); if (el) el.textContent = sumTotal(work, col.id); }
+  for (let i = 0; i < 2; i++) {
+    $('f-sign' + i + '-month').placeholder = autoMonth(work); $('f-sign' + i + '-year').placeholder = autoYear(work);
+    const room = TABLE_W - sumWidth(config.sumCols.length) - 2 - 2 * PAD;      // the signature block is what is left beside the summary table
+    work.sign[i].pos.forEach((l, j) => flagLong($('f-' + pid('sign.' + i + '.pos') + '-' + j), wider(l, room)));
+  }
+  const m = buildModel(work), cap = capacity(m), me = $('meter');
+  me.textContent = 'ใช้ ' + m.R + ' จาก ' + cap + ' บรรทัดของหน้า A4';
+  me.classList.toggle('over', !m.fits);
+  setStatus();
+}
+const isDirty = () => !saved.report || JSON.stringify(tidyReport(work)) !== JSON.stringify(tidyReport(saved.report));
+const savedCount = () => (saved.report ? (saved.revs[saved.report.dateFrom] || 0) : 0);
+const savedRev = () => Math.max(0, savedCount() - 1);
+const isOfficial = () => !isDirty() && savedCount() > 0;      // what is on screen is exactly what was saved
+const curRev = () => (isOfficial() ? savedRev() : 0);         // the revision printed on the form: only what is on screen exactly as saved has one
+function setStatus() {
+  const el = $('save-status'), m = saved.meta;
+  if (loading) { el.dataset.s = 'loading'; el.textContent = 'กำลังโหลดข้อมูลล่าสุด…'; return; }
+  const local = store ? '' : ' (เก็บในเบราว์เซอร์นี้)';
+  if (isOfficial()) {
+    const rev = savedRev();
+    el.dataset.s = 'saved';
+    el.textContent = 'SAVE แล้ว ' + stampOf(new Date(m.savedAt)).text + (rev ? ' REV.' + rev : '') + local;
+    return;
+  }
+  el.dataset.s = saved.report ? 'dirty' : 'none';
+  el.textContent = (saved.report && isDirty() && savedCount() > 0 ? 'มีการแก้ไขที่ยังไม่ได้ SAVE' : 'ยังไม่ได้ SAVE รายงานนี้') + ' · ไฟล์ที่ออกตอนนี้ขึ้นต้นด้วย DRAFT' + local;
+}
+
+/* ====================== popup list (dropdown / autocomplete) ====================== */
+const pop = $('pop');
+let popFor = null, popOpts = [], popAct = -1, popAll = false, choosing = false;
+function optsFor(el, all) {
+  const c = el.dataset.c, k = el.dataset.k || '', p = k.split('.'), cur = el.value.trim(), low = cur.toLowerCase();
+  const pick = (list) => (all || !cur || list.some((o) => o.v === cur)) ? list : list.filter((o) => o.v.toLowerCase().includes(low));
+  if (c === 'mark') return [{ v: 'X' }, { v: '/' }, { v: '', label: '— ว่าง —' }];
+  if (c === 'status') return STATUS.map((v) => ({ v })).concat([{ v: '', label: '— ว่าง —' }]);
+  if (c === 'sched') return [{ v: '', label: 'ไม่ระบุ' }, { v: 'SCHEDULE' }, { v: 'UNSCHEDULE' }];
+  if (c === 'rank') return pick(RANKS.map((v) => ({ v })));
+  if (c === 'month') return [{ v: '', label: 'ตามวันที่รายงาน', note: autoMonth(work) }].concat(MON.map((v) => ({ v })));
+  if (c === 'year') { const y = (refDate(work).y + 543) % 100, o = [{ v: '', label: 'ตามวันที่รายงาน', note: autoYear(work) }]; for (let d = -5; d <= 5; d++) o.push({ v: thaiNum(pad2((y + d + 100) % 100)) }); return o; }
+  if (c === 'check') {
+    const a = acById(p[1]), hint = nextHint(a);
+    const list = profChecks(a).concat(COMMON_CHECKS).map((v) => ({ v }));
+    list.forEach((o) => { if (o.v === hint.check) o.note = hint.next ? 'ครั้งถัดไป' : 'ครั้งล่าสุดที่บันทึก'; });
+    return pick(list);
+  }
+  if (c === 'cnum') {
+    const a = acById(p[1]), lim = lockedMax(a.id), o = [];
+    for (let n = 1; n <= 99; n++) o.push({ v: String(n), label: 'C' + n, note: n <= lim ? 'ทำไปแล้ว · ล็อก' : (n === lim + 1 ? 'ครั้งถัดไป' : '') });
+    return o;
+  }
+  if (c === 'sname') return pick(config.signers[+p[1]].names.map((q) => ({ v: q.name, note: q.rank, del: 'n' + p[1] })));
+  if (el.dataset.line && p[0] === 'sign') {
+    const used = work.sign[+p[1]].pos.map((x) => x.trim());
+    const list = config.signers[+p[1]].pos.filter((v) => !used.includes(v)).map((v) => ({ v, del: 'p' + p[1] }));
+    return cur ? list.filter((o) => o.v.toLowerCase().includes(low)) : list;
+  }
+  // plain fields: offer what was saved last time so it can be picked without retyping
+  if (!saved.report || el.type === 'date') return [];
+  let vals;
+  if (el.dataset.line) { const used = getPath(work, el.dataset.line).map((x) => x.trim()); vals = trimTail(getPath(saved.report, el.dataset.line) || []).filter((v) => v && !used.includes(v.trim())); }
+  else vals = [phFor(k)].filter((v) => v && v !== cur);
+  const list = vals.map((v) => ({ v, note: 'บันทึกครั้งล่าสุด' }));
+  return cur ? list.filter((o) => o.v.toLowerCase().startsWith(low) && o.v !== cur) : list;
+}
+function openPop(el, all) {
+  const opts = optsFor(el, all);
+  if (!opts.length) { closePop(); return; }
+  popFor = el; popOpts = opts; popAct = -1; popAll = !!all;
+  pop.innerHTML = opts.map((o, i) => {
+    const gone = o.del && pend[o.del].includes(o.v), note = gone ? 'จะลบเมื่อ SAVE' : o.note;
+    return '<div class="opt' + (gone ? ' gone' : '') + '" role="option" data-i="' + i + '" aria-selected="false"><span>' + esc(o.label || o.v) + '</span><span class="tail">'
+      + (note ? '<small>' + esc(note) + '</small>' : '')
+      + (o.del ? '<button type="button" class="del" data-del="' + i + '" aria-label="' + (gone ? 'ยกเลิกการลบ ' : 'ลบออกจากรายการ ') + esc(o.v) + '">' + (gone ? 'ยกเลิก' : '×') + '</button>' : '') + '</span></div>';
+  }).join('');
+  pop.hidden = false;
+  placePop();
+  const cur = opts.findIndex((o) => o.v === el.value && o.v !== '');
+  if (cur >= 0) setAct(cur);
+}
+// keep the list attached to its field while the page scrolls (focus and on-screen keyboards both scroll)
+function placePop() {
+  if (pop.hidden || !popFor) return;
+  const r = popFor.getBoundingClientRect(), vh = window.innerHeight, vw = window.innerWidth;
+  if (r.bottom < 0 || r.top > vh) { closePop(); return; }
+  pop.style.minWidth = Math.max(120, r.width) + 'px';
+  pop.style.maxHeight = '290px';
+  const ph = Math.min(290, pop.scrollHeight + 10), below = vh - r.bottom - 8;
+  if (below >= Math.min(ph, 150) || below >= r.top) { pop.style.top = (r.bottom + 2) + 'px'; pop.style.maxHeight = Math.max(90, Math.min(290, below)) + 'px'; }
+  else { const mh = Math.max(90, Math.min(290, r.top - 8)); pop.style.maxHeight = mh + 'px'; pop.style.top = Math.max(4, r.top - Math.min(mh, ph) - 2) + 'px'; }
+  pop.style.left = Math.max(4, Math.min(r.left, vw - pop.offsetWidth - 4)) + 'px';
+}
+function closePop() { pop.hidden = true; popFor = null; popOpts = []; popAct = -1; }
+function setAct(i) {
+  popAct = i;
+  pop.querySelectorAll('.opt').forEach((o, n) => { o.setAttribute('aria-selected', String(n === i)); if (n === i) o.scrollIntoView({ block: 'nearest' }); });
+}
+function choose(i) {
+  const el = popFor, o = popOpts[i];
+  if (!el || !o) return;
+  closePop();
+  el.value = o.v;
+  choosing = true;
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+  el.dispatchEvent(new Event('change', { bubbles: true }));
+  choosing = false;
+  if (el.dataset.c === 'sname') {                           // a picked name brings the rank and positions last saved with it
+    const i = +el.dataset.k.split('.')[1], q = config.signers[i].names.find((x) => x.name === o.v);
+    if (q) { work.sign[i].rank = q.rank; work.sign[i].pos = lines(q.pos); $('f-sign' + i + '-rank').value = q.rank; renderList('sign.' + i + '.pos'); edited(); }
+  }
+}
+pop.addEventListener('mousedown', (e) => { e.preventDefault(); });
+pop.addEventListener('click', (e) => {
+  const del = e.target.closest('[data-del]');
+  if (del) {                                                // mark / unmark for removal; it leaves the list at the next SAVE
+    const o = popOpts[+del.dataset.del], list = pend[o.del], at = list.indexOf(o.v);
+    if (at >= 0) list.splice(at, 1); else list.push(o.v);
+    saveDraft();
+    openPop(popFor, popAll);
+    return;
+  }
+  const opt = e.target.closest('.opt');
+  if (opt) choose(+opt.dataset.i);
+});
+document.addEventListener('focusin', (e) => { const el = e.target; if (el.matches && el.matches('input[data-k]') && !el.closest('dialog')) openPop(el, el.readOnly || !!el.dataset.c); });
+document.addEventListener('focusout', (e) => { if (e.target === popFor) setTimeout(() => { if (popFor === e.target && document.activeElement !== e.target) closePop(); }, 120); });
+document.addEventListener('mousedown', (e) => { const el = e.target; if (el.matches && el.matches('input[data-k]') && document.activeElement === el && pop.hidden) openPop(el, true); });
+window.addEventListener('resize', placePop);
+document.addEventListener('scroll', (e) => { if (e.target !== pop) placePop(); }, true);
+
+/* ====================== dialogs ====================== */
+const dlg = $('dlg');
+let askChain = Promise.resolve();
+// one dialog at a time: a second request waits for the first to be answered
+function ask(o) { const p = askChain.then(() => askNow(o)); askChain = p.then(() => {}, () => {}); return p; }
+const settled = () => askChain;
+function askNow(o) {
+  return new Promise((resolve) => {
+    let h = '<form class="dlg" novalidate><h3>' + esc(o.title || '') + '</h3>';
+    if (o.message) h += '<p>' + esc(o.message) + '</p>';
+    if (o.list) h += '<ul>' + o.list.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>';
+    if (o.fields) {
+      h += '<div class="fields">' + o.fields.map((f) => {
+        if (f.type === 'checkbox') return '<label class="chkrow"><input type="checkbox" name="' + f.id + '"' + (f.value ? ' checked' : '') + '>' + esc(f.label) + '</label>';
+        if (f.type === 'select') return '<label class="f"><span>' + esc(f.label) + '</span><select name="' + f.id + '">' + f.options.map((x) => '<option value="' + esc(x.v) + '"' + (x.v === f.value ? ' selected' : '') + '>' + esc(x.label) + '</option>').join('') + '</select></label>';
+        return '<label class="f"><span>' + esc(f.label) + '</span><input type="' + (f.type || 'text') + '" name="' + f.id + '" value="' + esc(f.value || '') + '" autocomplete="off"' + (f.attrs || '') + '></label>';
+      }).join('') + '</div>';
+    }
+    if (o.actions) h += '<div class="dacts">' + o.actions.map((a, i) => '<button type="button" class="btn" data-a="' + i + '">' + esc(a.label) + '</button>').join('') + '</div><div class="dinfo" role="status"></div>';
+    h += '<div class="derr" role="alert"></div><div class="dbtns">' + (o.noCancel ? '' : '<button type="button" class="btn" data-x="cancel">' + esc(o.cancel || 'ยกเลิก') + '</button>')
+      + '<button type="submit" class="btn primary">' + esc(o.ok || 'ตกลง') + '</button></div></form>';
+    dlg.innerHTML = h;
+    const form = dlg.firstChild, err = form.querySelector('.derr');
+    const done = (v) => { dlg.oncancel = null; if (dlg.open) dlg.close(); resolve(v); };
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const vals = {};
+      (o.fields || []).forEach((f) => { const el = form.elements[f.id]; vals[f.id] = f.type === 'checkbox' ? el.checked : el.value; });
+      const msg = o.check ? o.check(vals) : '';
+      if (msg) { err.textContent = msg; return; }
+      done(o.fields ? vals : true);
+    });
+    form.addEventListener('click', async (e) => {
+      if (e.target.dataset.x === 'cancel') { done(null); return; }
+      const a = e.target.dataset.a;
+      if (a == null) return;
+      const btn = e.target, info = form.querySelector('.dinfo');
+      btn.disabled = true; info.textContent = o.actions[+a].busy || 'กำลังสร้างไฟล์…';
+      try { info.textContent = (await o.actions[+a].run()) || ''; } catch (x) { info.textContent = o.actions[+a].fail || 'สร้างไฟล์ไม่สำเร็จ ลองอีกครั้ง'; }
+      btn.disabled = false;
+    });
+    dlg.oncancel = (e) => { e.preventDefault(); done(null); };
+    closePop();
+    if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+    const first = form.querySelector('.fields input, .fields select') || form.querySelector('button[type="submit"]');
+    if (first) first.focus();
+  });
+}
+const PASS_FIELD = { id: 'pw', label: 'รหัสผ่าน', type: 'password' };
+async function askPass(kind, message, title) {
+  const r = await ask({ title: title || 'ต้องใช้รหัสผ่าน', message, fields: [PASS_FIELD], ok: 'ยืนยัน', check: (v) => (passOk(kind, v.pw) ? '' : 'รหัสผ่านไม่ถูกต้อง') });
+  return !!r;
+}
+let toastTimer = 0;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 4200); }
+
+/* ====================== editing ====================== */
+function sanitize(el) {
+  const kind = el.dataset.san;
+  if (!kind) return;
+  let v = arabic(el.value);
+  if (kind === 'day') v = v.replace(/\D/g, '').slice(0, 2);
+  else if (kind === 'sum' && /^\s*-/.test(v) && !/\d/.test(v)) v = '-';
+  else { v = v.replace(/[^0-9.]/g, ''); const i = v.indexOf('.'); if (i >= 0) v = v.slice(0, i + 1) + v.slice(i + 1).replace(/\./g, ''); }
+  if (v !== el.value) el.value = v;
+}
+let draftTimer = 0, pvTimer = 0;
+function edited() {
+  touched = true;
+  refresh();
+  clearTimeout(draftTimer); draftTimer = setTimeout(saveDraft, 500);
+  if (!$('panel-preview').hidden) { clearTimeout(pvTimer); pvTimer = setTimeout(renderPreview, 150); }
+}
+function saveDraft() { lsSet('draft', { work, approvals, pend, base: saved.meta.savedAt }); }
+
+document.addEventListener('input', (e) => {
+  const el = e.target, k = el.dataset && el.dataset.k;
+  if (!k || el.closest('dialog')) return;
+  sanitize(el);
+  el.classList.remove('bad');
+  const wasFrom = work.dateFrom;
+  setPath(work, k, el.value);
+  if (k === 'dateFrom' || k === 'dateTo') {
+    const a = parseISO(work.dateFrom);
+    // a one-day report keeps being one day when its start date moves; an end date left before the new start follows it too
+    if (a && (!parseISO(work.dateTo) || (k === 'dateFrom' && (!toOk(work) || work.dateTo === wasFrom)))) { work.dateTo = work.dateFrom; $('f-dateTo').value = work.dateTo; }
+    const b = parseISO(work.dateTo);
+    if (a && b && toOk(work)) { work.days = String(Math.round((b.t - a.t) / 86400000) + 1); $('f-days').value = work.days; }
+  }
+  if (!choosing && !el.readOnly && document.activeElement === el) openPop(el, false);
+  edited();
+});
+
+async function hoursCheck(k) {
+  const p = k.split('.'), a = acById(p[1]), isAf = p[2] === 'af', i = +p[3];
+  const v = str(getPath(work, k)).trim(), base = isAf ? afBase(a.id) : engBase(a.id, i);
+  if (!isNum(v) || base == null || Number(v) >= base || approvals[k] === v) return;
+  const sn = isAf ? '' : work.ac[a.id].sn[i].trim();
+  const msg = isAf
+    ? 'คุณกรอกจำนวน ชม.บ. หมายเลข ' + who(a) + ' น้อยกว่าที่เคยกรอกก่อนหน้า หากต้องการแก้ไขให้ใส่รหัสผ่านสำหรับแก้ไข'
+    : 'คุณกรอกจำนวน ชม.ย. หมายเลข ' + (sn || 'ENG.' + (i + 1) + ' ของ ' + who(a)) + ' น้อยกว่าที่เคยกรอกก่อนหน้า หากต้องการแก้ไขให้ใส่รหัสผ่านสำหรับแก้ไข';
+  const ok = await askPass('hours', msg + '\n\nค่าที่กรอก ' + v + ' · ค่าก่อนหน้า ' + base, 'ค่าน้อยกว่าครั้งก่อน');
+  if (ok) approvals[k] = v;
+  else { setPath(work, k, ''); const el = $('f-' + a.id + '-' + (isAf ? 'af' : 'eng' + i)); if (el) el.value = ''; }
+  edited();
+}
+async function cnumCheck(a) {
+  const s = work.ac[a.id], n = +s.cnum, sv = saved.report && saved.report.ac[a.id];
+  if (!n || n > lockedMax(a.id) || approvals['c.' + a.id] === s.cnum) return;
+  if (sv && sv.check === heavyOf(a) && sv.cnum === s.cnum) return;          // unchanged from what is already saved
+  const ok = await askPass('admin', 'คุณได้ดำเนินการ C-' + n + 'ไปแล้ว ยืนยันว่าต้องการใส่เลขนี้', 'เลข C นี้ถูกล็อก');
+  if (ok) approvals['c.' + a.id] = s.cnum;
+  else { s.cnum = ''; $('f-' + a.id + '-cnum').value = ''; }
+  edited();
+}
+document.addEventListener('change', (e) => {
+  const el = e.target;
+  if (el.closest('dialog')) return;
+  if (el.id === 'toggle-key') { $('grid').classList.toggle('show-key', el.checked); fitGrid(); return; }
+  if (el.id === 'h-src') { histLoad(); return; }
+  if (el.id === 'h-month') { histList(); return; }
+  const k = el.dataset.k;
+  if (!k) return;
+  if (k === 'dateTo' && parseISO(work.dateFrom) && parseISO(work.dateTo) && !toOk(work)) {
+    work.dateTo = work.dateFrom; el.value = work.dateTo; work.days = '1'; $('f-days').value = '1';
+    toast('“ถึงวันที่” ย้อนหลังก่อนวันเริ่มต้นไม่ได้ เลือกได้ตั้งแต่วันเริ่มต้นเป็นต้นไป');
+    edited(); return;
+  }
+  const p = k.split('.');
+  if (p[0] !== 'ac') return;
+  const a = acById(p[1]), s = work.ac[a.id];
+  if (p[2] === 'af' || p[2] === 'eng') hoursCheck(k);
+  else if (p[2] === 'sn') { s.sn[+p[3]] = el.value = el.value.trim(); hoursCheck('ac.' + a.id + '.eng.' + p[3]); edited(); }
+  else if (p[2] === 'check') {
+    const m = /^C\s*-?\s*(\d{1,2})\s*-\s*CHECK$/i.exec(el.value.trim());
+    if (m && heavyOf(a)) { s.check = el.value = heavyOf(a); s.cnum = String(+m[1]); $('f-' + a.id + '-cnum').value = s.cnum; }
+    if (s.check.trim() !== heavyOf(a)) { s.cnum = ''; $('f-' + a.id + '-cnum').value = ''; }
+    edited();
+    if (s.cnum) cnumCheck(a);
+  }
+  else if (p[2] === 'cnum') cnumCheck(a);
+});
+
+function rowsIfFilled(mutate) { const sim = clone(work); mutate(sim); return buildModel(sim).fits; }
+const FULL = 'เต็มหน้า A4 แล้ว เพิ่มไม่ได้ ให้ลดบรรทัดข้อขัดข้องก่อน แล้วจึงลดแถวสรุปหรือเครื่องบิน';
+function addLine(path, at) {
+  const arr = getPath(work, path);
+  const fits = rowsIfFilled((sim) => { const a = getPath(sim, path); for (let i = 0; i < a.length; i++) a[i] = a[i] || 'x'; a.push('x'); });
+  if (!fits) { toast(FULL); return; }
+  if (at == null) at = arr.length;
+  arr.splice(at, 0, '');
+  renderList(path, at); edited();
+}
+document.addEventListener('keydown', (e) => {
+  const el = e.target;
+  if (!el.matches || !el.matches('input[data-k]') || el.closest('dialog')) return;
+  if (!pop.hidden && popFor === el) {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); const n = popOpts.length; setAct(((popAct < 0 ? (e.key === 'ArrowDown' ? -1 : 0) : popAct) + (e.key === 'ArrowDown' ? 1 : -1) + n) % n); return; }
+    if (e.key === 'Enter' && popAct >= 0) { e.preventDefault(); choose(popAct); return; }
+    if (e.key === 'Escape') { e.preventDefault(); closePop(); return; }
+  } else if (e.key === 'ArrowDown' && el.dataset.c) { e.preventDefault(); openPop(el, true); return; }
+  if (e.key === 'Enter' && el.dataset.line) { e.preventDefault(); addLine(el.dataset.line, +el.dataset.k.split('.').pop() + 1); }
+});
+document.addEventListener('paste', (e) => {
+  const el = e.target;
+  if (!el.dataset || !el.dataset.line) return;
+  const text = (e.clipboardData || window.clipboardData).getData('text');
+  if (!/\n/.test(text)) return;
+  e.preventDefault();
+  const path = el.dataset.line, arr = getPath(work, path), i = +el.dataset.k.split('.').pop();
+  const parts = text.replace(/\r/g, '').split('\n').filter((x) => x.trim() !== '');
+  const next = arr.slice(0, i).concat([arr[i] + (parts[0] || '')], parts.slice(1), arr.slice(i + 1));
+  if (!rowsIfFilled((sim) => { setPath(sim, path, next.map((x) => x || 'x')); })) { toast(FULL); return; }
+  setPath(work, path, next); renderList(path, Math.min(next.length - 1, i + parts.length - 1)); edited();
+});
+
+/* ====================== structure changes (password protected) ====================== */
+async function saveConfig() {
+  config = normConfig(config);
+  lsSet('config', config);
+  work = normReport(work);
+  if (saved.report) saved.report = normReport(saved.report);
+  saved = normState(saved);
+  renderAll(); saveDraft();
+  if (store && canWrite) { try { await store.config.set(clone(config)); } catch (e) { toast('เก็บค่าเริ่มต้นเข้าระบบไม่สำเร็จ เก็บไว้ในเบราว์เซอร์นี้แล้ว'); } }
+}
+async function addAircraft() {
+  const types = Object.keys(PROFILES);
+  const r = await ask({
+    title: 'เพิ่มเครื่องบิน', ok: 'เพิ่ม',
+    fields: [
+      { id: 'type', label: 'บ.แบบ (คอลัมน์ B) เช่น บ.ล.18' }, { id: 'tail', label: 'หมายเลข (คอลัมน์ C บรรทัดบน) เช่น 4/70' }, { id: 'serial', label: 'หมายเลขในวงเล็บ (คอลัมน์ C บรรทัดล่าง) เช่น 60209' },
+      { id: 'eng', label: 'จำนวนเครื่องยนต์', type: 'number', value: '2', attrs: ' min="1" max="8" step="1"' },
+      { id: 'profile', label: 'ใช้รายการ CHECK แบบเดียวกับ', type: 'select', value: '', options: [{ v: '', label: 'ตาม บ.แบบ ที่กรอก (ถ้าไม่มีจะมีแค่ A/C PRESERVATION และ HANGAR QUEEN)' }].concat(types.map((t) => ({ v: t, label: t }))) },
+      { id: 'key', label: 'รหัส บ. สำหรับคอลัมน์ K ที่ซ่อน เช่น SSJ100LR (09)' }, PASS_FIELD,
+    ],
+    check: (v) => {
+      if (!v.type.trim() || !v.tail.trim() || !v.serial.trim() || !v.key.trim()) return 'กรอกให้ครบทุกช่อง';
+      const n = +v.eng; if (!(n >= 1 && n <= 8) || n !== Math.round(n)) return 'จำนวนเครื่องยนต์ต้องเป็น 1 ถึง 8';
+      if (config.aircraft.some((a) => a.key === v.key.trim())) return 'รหัส บ. นี้มีอยู่แล้ว';
+      return passOk('admin', v.pw) ? '' : 'รหัสผ่านไม่ถูกต้อง';
+    },
+  });
+  if (!r) return;
+  const type = r.type.trim(), a = { id: 'ac_' + Date.now().toString(36), type, tail: r.tail.trim(), serial: r.serial.trim().replace(/^\(|\)$/g, ''), key: r.key.trim(), eng: +r.eng, profile: r.profile || (PROFILES[type] ? type : ''), builtin: false };
+  const before = config.aircraft.slice();
+  config.aircraft.push(a);
+  if (!buildModel(normReport(work)).fits) { config.aircraft = before; toast(FULL); return; }
+  await saveConfig(); toast('เพิ่ม ' + a.type + ' ' + a.tail + ' แล้ว และเก็บเป็นค่าเริ่มต้น');
+}
+async function removeItem(kind, id) {
+  const list = kind === 'ac' ? config.aircraft : kind === 'row' ? config.sumRows : config.sumCols, it = list.find((x) => x.id === id);
+  if (!it || it.builtin) return;
+  const name = kind === 'ac' ? it.type + ' ' + it.tail : it.label;
+  if (!await askPass('admin', 'ลบ “' + name + '” และข้อมูลที่กรอกไว้ในรายการนี้', 'ลบรายการ')) return;
+  list.splice(list.indexOf(it), 1);
+  await saveConfig(); toast('ลบแล้ว');
+}
+async function addSum(kind) {
+  if (kind === 'col' && config.sumCols.length >= MAX_SUM_COLS) { toast('ตารางสรุปรับได้สูงสุด ' + MAX_SUM_COLS + ' คอลัมน์ ไม่เช่นนั้นจะชนช่องลงนาม'); return; }
+  const fields = [{ id: 'label', label: kind === 'col' ? 'ชื่อ บ.แบบ (หัวคอลัมน์)' : 'ชื่อรายการ (แถว)' }];
+  if (kind === 'row') fields.push({ id: 'sum', label: 'นับรวมใน ชม.บินรวมในเดือน', type: 'checkbox', value: true });
+  fields.push(PASS_FIELD);
+  const r = await ask({ title: kind === 'col' ? 'เพิ่ม บ.แบบ ในตารางสรุป' : 'เพิ่มรายการในตารางสรุป', ok: 'เพิ่ม', fields, check: (v) => (!v.label.trim() ? 'กรอกชื่อก่อน' : passOk('admin', v.pw) ? '' : 'รหัสผ่านไม่ถูกต้อง') });
+  if (!r) return;
+  const id = (kind === 'col' ? 'cx' : 'rx') + Date.now().toString(36);
+  if (kind === 'col') config.sumCols.push({ id, label: r.label.trim(), builtin: false });
+  else {
+    const at = r.sum ? config.sumRows.findIndex((x) => x.total) : -1;       // mission rows go just above the total
+    const row = { id, label: r.label.trim(), builtin: false, sum: !!r.sum, total: false, dyn: '' };
+    if (at >= 0) config.sumRows.splice(at, 0, row); else config.sumRows.push(row);
+    if (!buildModel(normReport(work)).fits) { config.sumRows.splice(config.sumRows.indexOf(row), 1); toast(FULL); return; }
+  }
+  await saveConfig(); toast('เพิ่มแล้ว และเก็บเป็นค่าเริ่มต้น');
+}
+async function moveRow(i, d) {
+  const j = i + d;
+  if (j < 0 || j >= config.sumRows.length) return;
+  const t = config.sumRows[i]; config.sumRows[i] = config.sumRows[j]; config.sumRows[j] = t;
+  await saveConfig();
+  const b = document.querySelector('[data-act="' + (d < 0 ? 'rowup' : 'rowdown') + '"][data-i="' + j + '"]'); if (b && !b.disabled) b.focus();
+}
+
+/* ====================== validation ====================== */
+function validate(action) {
+  const errs = [], bad = [];
+  const add = (msg, id) => { errs.push(msg); if (id) bad.push(id); };
+  const m = buildModel(work);
+  for (const a of config.aircraft) {
+    const s = work.ac[a.id], name = a.type + ' ' + who(a), base = afBase(a.id), af = s.af.trim();
+    if (base != null && af === '') add('ยังไม่ได้กรอกเวลา บ. ของ ' + name, 'f-' + a.id + '-af');
+    else if (isNum(af) && base != null && Number(af) < base && approvals['ac.' + a.id + '.af'] !== af) add('เวลา บ. ของ ' + name + ' น้อยกว่าครั้งก่อน (' + base + ')', 'f-' + a.id + '-af');
+    if (action !== 'save') continue;
+    for (let i = 0; i < a.eng; i++) {
+      const h = s.eng[i].trim(), eb = engBase(a.id, i);
+      if (h && !s.sn[i].trim()) add('ยังไม่ได้กรอกหมายเลขเครื่องยนต์ ENG.' + (i + 1) + ' ของ ' + name, 'f-' + a.id + '-sn' + i);
+      if (isNum(h) && eb != null && Number(h) < eb && approvals['ac.' + a.id + '.eng.' + i] !== h) add('เวลา ย. ENG.' + (i + 1) + ' ของ ' + name + ' น้อยกว่าครั้งก่อน (' + eb + ')', 'f-' + a.id + '-eng' + i);
+    }
+    const c = s.check.trim(), f = parseISO(s.from), t = parseISO(s.to);
+    if (c && !dateFree(c) && !(f && t)) add('ยังไม่ได้ใส่วันที่เริ่มและสิ้นสุดของ ' + checkText(a, s) + ' (' + name + ')', 'f-' + a.id + (f ? '-to' : '-from'));
+    if (f && t && t.t < f.t) add('วันสิ้นสุดซ่อมบำรุงอยู่ก่อนวันเริ่ม (' + name + ')', 'f-' + a.id + '-to');
+    if (c && c === heavyOf(a)) {
+      const sv = saved.report && saved.report.ac[a.id], same = sv && sv.check === c && sv.cnum === s.cnum;
+      if (!s.cnum) add('ยังไม่ได้เลือกเลขครั้ง C ของ ' + c + ' (' + name + ')', 'f-' + a.id + '-cnum');
+      else if (+s.cnum <= lockedMax(a.id) && !same && approvals['c.' + a.id] !== s.cnum) add('C' + s.cnum + ' ของ ' + name + ' ถูกล็อก เลือกเลขใหม่อีกครั้งเพื่อปลดล็อก', 'f-' + a.id + '-cnum');
+    }
+  }
+  if (action === 'save') {
+    const a = parseISO(work.dateFrom), b = parseISO(work.dateTo);
+    if (!work.time.trim()) add('ยังไม่ได้กรอก “เมื่อเวลา”', 'f-time');
+    if (!work.days.trim()) add('ยังไม่ได้กรอก “ก่อนหน้า (วัน)”', 'f-days');
+    if (!a) add('ยังไม่ได้เลือก “ประจำวันที่”', 'f-dateFrom');
+  }
+  if (action !== 'preview' && parseISO(work.dateFrom) && parseISO(work.dateTo) && !toOk(work)) add('“ถึงวันที่” อยู่ก่อน “ประจำวันที่ ตั้งแต่” ไม่ได้', 'f-dateTo');
+  if (action !== 'preview' && !m.fits) add('ข้อมูลมี ' + m.R + ' บรรทัด เกินหนึ่งหน้า A4 (รับได้ ' + capacity(m) + ' บรรทัด) ให้ลดบรรทัดข้อขัดข้องก่อน แล้วจึงลดแถวสรุปหรือเครื่องบิน');
+  document.querySelectorAll('input.bad').forEach((el) => el.classList.remove('bad'));
+  if (!errs.length) return Promise.resolve(true);
+  bad.forEach((id) => { const el = $(id); if (el) el.classList.add('bad'); });
+  const label = { save: 'SAVE', pdf: 'PRINT TO PDF', preview: 'PREVIEW' }[action];
+  return ask({ title: 'ยัง ' + label + ' ไม่ได้', list: errs, ok: 'กลับไปแก้ไข', noCancel: true }).then(() => {
+    showPanel('edit');
+    const el = bad.length && $(bad[0]);
+    if (el) { el.scrollIntoView({ block: 'center' }); el.focus({ preventScroll: true }); }
+    return false;
+  });
+}
+
+/* ====================== storage ====================== */
+const use = (name) => {
+  try { return (window.claude && typeof window.claude.use === 'function') ? Promise.resolve(window.claude.use(name)).catch(() => null) : Promise.resolve(null); }
+  catch (e) { return Promise.resolve(null); }
+};
+const pDb = use('db'), pUser = use('user'), pDl = use('downloads'), pMcp = use('mcp');
+let store = null, canWrite = true, loading = false;
+
+function adoptWork() {
+  const d = lsGet('draft');
+  if (d && d.work && str(d.base) === saved.meta.savedAt) {
+    work = normReport(d.work); approvals = (d.approvals && typeof d.approvals === 'object') ? d.approvals : {};
+    pend = newPend(); for (const k in pend) if (d.pend && Array.isArray(d.pend[k])) pend[k] = d.pend[k].map(str);
+  } else { work = saved.report ? clone(saved.report) : blankReport(true); approvals = {}; pend = newPend(); }
+}
+async function connectStore() {
+  if (!window.claude) return;
+  loading = true; setStatus();
+  const db = await pDb;
+  if (db) {
+    try {
+      const st = { config: db.doc('app/config'), state: db.doc('app/state'), sheets: db.doc('app/sheets'), lock: db.doc('app/savelock'), gslock: db.doc('app/gslock'), hist: (id) => db.doc('history/' + id), histRecent: () => db.collection('history').orderBy('savedAt', 'desc').limit(10).get(), histAll: () => db.collection('history').orderBy('savedAt', 'desc').limit(1000).get() };
+      const [c, s] = await Promise.all([st.config.get(), st.state.get()]);
+      store = st;
+      try { const g = await st.sheets.get(); if (g.exists) { sheets = normSheets(clone(g.data())); lsSet('sheets', sheets); } } catch (e) { /* keep what this browser remembers */ }
+      let w = null;
+      try { const user = await pUser; w = user ? await user.can('data.write') : null; } catch (e) { w = null; }
+      canWrite = w !== false;
+      if (c.exists) { config = normConfig(clone(c.data())); lsSet('config', config); }
+      if (s.exists) { saved = normState(clone(s.data())); lsSet('state', saved); }
+      else saved = normState(saved);
+      if (!touched) adoptWork(); else work = normReport(work);
+    } catch (e) { store = null; }
+  }
+  loading = false;
+  renderAll();
+  renderGs();
+  fyRemind();
+}
+function stampOf(t) {
+  const d = new Date(t.getTime() + 7 * 3600e3), y2 = pad2(d.getUTCFullYear() % 100), mon = MON_EN[d.getUTCMonth()], dd = pad2(d.getUTCDate()), hm = pad2(d.getUTCHours()) + '.' + pad2(d.getUTCMinutes());
+  return { file: y2 + mon + dd + ' ' + hm + ' TH-LT', text: dd + ' ' + mon + ' ' + y2 + ' เวลา ' + hm + ' น.' };
+}
+const fileName = (ext) => { const ok = isOfficial(), rev = ok ? savedRev() : 0; return (ok ? '' : 'DRAFT ') + 'รายงานสถานภาพ บ. 602 ' + stampOf(new Date()).file + (rev ? ' REV.' + rev : '') + '.' + ext; };
+
+const SIMUL = 'มีการบันทึกข้อมูลพร้อมกันมากกว่า1เครื่อง ให้ทำการบันทึกใหม่';
+const TAB_ID = 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+// a short cooperative lock in the page store: true = this page holds it, false = another device holds it, null = locks cannot be used here
+async function lease(ref, ttlMs) {
+  try { if (!ref || typeof ref.acquire !== 'function') return null; const r = await ref.acquire({ holder: TAB_ID, ttlMs }); return !(r && r.acquired === false); }
+  catch (e) { return null; }
+}
+function unlease(ref) {          // there is no release: the lease is cut down to a second
+  try { if (ref && typeof ref.acquire === 'function') return Promise.resolve(ref.acquire({ holder: TAB_ID, ttlMs: 1000 })).catch(() => {}); } catch (e) { /* it lapses by itself */ }
+  return Promise.resolve();
+}
+const sameReport = (a, b) => JSON.stringify(tidyReport(normReport(a))) === JSON.stringify(tidyReport(normReport(b)));
+function adoptRemote(remote) { const rs = normState(clone(remote || {})); saved.eng = rs.eng; saved.heavy = rs.heavy; saved.meta = rs.meta; saved.revs = rs.revs; }
+// the report most recently saved for a start date, when it is not the one this page already holds
+async function lastSaved(key, n) {
+  if (store) { try { const d = await store.hist(histId(key, n)).get(); return d.exists ? d.data().report : null; } catch (e) { return null; } }
+  const h = (lsGet('hist') || []).filter((x) => x && x.report && str(x.reportDate || x.report.dateFrom) === key);
+  return h.length ? h[h.length - 1].report : null;
+}
+async function doSave() {
+  await settled();
+  if (!await validate('save')) return;
+  if (store && !canWrite) { toast('สิทธิ์ของคุณดูได้อย่างเดียว จึง SAVE เข้าระบบไม่ได้'); return; }
+  const rep = tidyReport(work), key = rep.dateFrom;
+  let last = (saved.report && saved.report.dateFrom === key) ? saved.report : null;
+  if (store) {
+    try {
+      const snap = await store.state.get(), remote = snap.exists ? snap.data() : null, at = remote && remote.meta ? str(remote.meta.savedAt) : '';
+      if (at !== saved.meta.savedAt) {
+        if (!await ask({ title: 'มีการ SAVE จากที่อื่น', message: 'มีผู้กด SAVE หลังจากที่คุณเปิดหน้านี้ ถ้าบันทึกต่อ ข้อมูลของคุณจะทับรายงานนั้น', ok: 'บันทึกทับ' })) return;
+        adoptRemote(remote);
+      }
+      if (remote && remote.report && str(remote.report.dateFrom) === key) last = remote.report;
+    } catch (e) { /* cannot compare: carry on with what this page loaded */ }
+  }
+  // signer lists: new names and position lines join the list now; marked ones leave it unless this report still uses them
+  const cfg = clone(config);
+  for (let i = 0; i < 2; i++) {
+    const g = rep.sign[i], sg = cfg.signers[i], name = g.name.trim(), pos = trimTail(g.pos).map((x) => x.trim()).filter(Boolean);
+    if (name) { const q = sg.names.find((x) => x.name === name); if (q) { q.rank = g.rank.trim(); q.pos = pos; } else sg.names.push({ name, rank: g.rank.trim(), pos }); }
+    pos.forEach((v) => { if (!sg.pos.includes(v)) sg.pos.push(v); });
+    sg.names = sg.names.filter((x) => x.name === name || !pend['n' + i].includes(x.name));
+    sg.pos = sg.pos.filter((v) => pos.includes(v) || !pend['p' + i].includes(v));
+  }
+  const cfgChanged = JSON.stringify(cfg) !== JSON.stringify(config);
+  // a report date that already has a SAVE takes another one only when something in the report changed
+  const done = saved.revs[key] || 0;
+  if (done > 0 && !last) last = await lastSaved(key, done);
+  if (done > 0 && last && sameReport(last, rep)) {
+    if (cfgChanged) {
+      if (store) { try { await store.config.set(clone(cfg)); } catch (e) { toast('เก็บรายการชื่อและตำแหน่งไม่สำเร็จ ลองอีกครั้ง'); return; } }
+      config = cfg; pend = newPend(); lsSet('config', config); saveDraft();
+      toast('ข้อมูลรายงานไม่มีการเปลี่ยนแปลง จึงไม่นับเป็นการ SAVE ครั้งใหม่ · ปรับรายการชื่อและตำแหน่งแล้ว');
+    } else await ask({ title: 'ยัง SAVE ไม่ได้', message: 'ข้อมูลของรายงานประจำวันที่ ' + dFull(parseISO(key)) + ' ยังไม่มีการแก้ไขเปลี่ยนแปลง เมื่อเทียบกับการ SAVE ครั้งล่าสุด\n\nSAVE ครั้งถัดไปของวันที่เดียวกันทำได้เมื่อข้อมูลเปลี่ยน', ok: 'ตกลง', noCancel: true });
+    return;
+  }
+  // one SAVE at a time across devices: the second one to arrive is told to save again, and nothing of it is written anywhere
+  let locked = null;
+  const simul = async () => { if (locked) await unlease(store.lock); refresh(); await ask({ title: 'SAVE ไม่สำเร็จ', message: SIMUL, ok: 'ตกลง', noCancel: true }); };
+  if (store) {
+    locked = await lease(store.lock, 20000);
+    if (locked === false) { locked = null; await simul(); return; }
+    try {
+      const snap = await store.state.get(), remote = snap.exists ? snap.data() : null, at = remote && remote.meta ? str(remote.meta.savedAt) : '';
+      if (at !== saved.meta.savedAt) { adoptRemote(remote); await simul(); return; }      // someone finished a SAVE in the moment before this one took the lock
+    } catch (e) { /* cannot compare: carry on */ }
+  }
+  // REV counts successful saves of the report with this start date: 1st save has none, 2nd is REV.1, ...
+  const now = new Date(), count = (saved.revs[key] || 0) + 1;
+  const next = { v: 2, report: rep, eng: clone(saved.eng), heavy: {}, revs: Object.assign({}, saved.revs, { [key]: count }), meta: { savedAt: now.toISOString() } };
+  for (const a of config.aircraft) {
+    const s = rep.ac[a.id], prev = saved.heavy[a.id] || { floor: 0, n: 0, to: '' };
+    s.sn.forEach((sn, i) => { if (sn && isNum(s.eng[i])) { const e = next.eng.find((x) => x.sn === sn); if (e) e.h = s.eng[i]; else next.eng.push({ sn, h: s.eng[i] }); } });
+    const heavy = s.check && s.check === heavyOf(a) && s.cnum;
+    next.heavy[a.id] = { floor: Math.max(prev.floor || 0, lockedMax(a.id)), n: heavy ? +s.cnum : 0, to: heavy ? s.to : '' };
+  }
+  const hid = histId(key, count);
+  let cfgKept = true;
+  if (store) {
+    try {
+      // the copy for the look-back page first, then app/state: the save counts only once app/state holds it
+      await store.hist(hid).set(Object.assign({ v: 2, report: clone(rep), savedAt: next.meta.savedAt, reportDate: key, rev: count - 1 }, structOf(cfg)));
+      await store.state.set(clone(next));
+    } catch (e) {
+      if (e && (e.code === 'invalid_argument' || e.code === 'revoked' || e.code === 'not_granted')) canWrite = false;
+      if (locked) await unlease(store.lock);
+      await ask({ title: 'SAVE ไม่สำเร็จ', message: 'บันทึกเข้าระบบไม่ได้ในขณะนี้ ข้อมูลที่กรอกยังอยู่ในหน้านี้ ลองกด SAVE อีกครั้ง', ok: 'ตกลง', noCancel: true });
+      return;
+    }
+    if (cfgChanged) { try { await store.config.set(clone(cfg)); } catch (e) { cfgKept = false; } }   // the signer lists are tried again at the next SAVE
+    if (locked) unlease(store.lock);
+  }
+  if (cfgKept) { config = cfg; pend = newPend(); }
+  saved = normState(next); work = clone(saved.report); approvals = {}; touched = false;
+  lsSet('state', saved); lsSet('config', config); lsSet('draft', null);
+  renderAll();
+  if (!store) { const h = lsGet('hist') || []; h.push({ report: rep, savedAt: next.meta.savedAt, reportDate: key, rev: count - 1 }); lsSet('hist', h.slice(-300)); }
+  $('saved-line').textContent = 'บันทึกเมื่อ ' + stampOf(now).text + (count > 1 ? ' REV.' + (count - 1) : '');
+  $('saved-sub').textContent = title1(work, count - 1) + (store ? '' : ' · เก็บไว้ในเบราว์เซอร์นี้ เพราะมุมมองนี้ยังไม่ได้เชื่อมกับระบบเก็บข้อมูล');
+  $('saved-info').textContent = '';
+  gsLast = store ? { s: 'busy' } : null; renderGs();
+  showPanel('saved');
+  $('saved-line').focus({ preventScroll: true });
+  if (store) gsQueue(hid).then(gsFlush);          // only a SAVE the page store has taken goes on to the Google Sheet
+}
+async function doClear() {
+  await settled();
+  if (!await ask({ title: 'CLEAR ข้อมูลทั้งหน้า', message: 'ช่องที่ไม่ได้ล็อกทุกช่องจะถูกล้างเพื่อกรอกใหม่ ค่าที่ SAVE ครั้งล่าสุดจะแสดงเป็นตัวเทาและเลือกจากรายการได้\n\nข้อมูลที่ SAVE ไว้แล้วไม่ถูกลบ', ok: 'CLEAR' })) return;
+  const sr = saved.report, r = blankReport(false);
+  if (sr) {
+    for (const a of config.aircraft) { r.ac[a.id].work = trimTail(sr.ac[a.id].work).map(() => ''); if (!r.ac[a.id].work.length) r.ac[a.id].work = ['']; r.ac[a.id].notes = lines(trimTail(sr.ac[a.id].notes).map(() => '')); }
+    r.sign.forEach((g, i) => { g.pos = lines(trimTail(sr.sign[i].pos).map(() => '')); });
+  }
+  work = r; approvals = {}; touched = true;
+  renderAll(); saveDraft();
+  toast('ล้างแล้ว ตัวเทาคือค่าที่ SAVE ครั้งล่าสุด');
+}
+
+/* ====================== page model (preview, PDF) ====================== */
+const PAGE = { W: 210, H: 297, ML: 8, MT: 6, MB: 6 };
+// The column grid is the one of the original workbook and is fixed. XLS_W holds the widths as that file stores them,
+// in 1/256 of a character of its default font (Calibri 11, whose digits are 7 px wide at 100 %); Excel shows them
+// as 3.67, 6.11, 11.33, 2.78, 4.89, 5.78, 6.33, 3.22, 31.67, 17.56 and 9.78 on a display set to 125 %.
+const XLS_W = [1133, 1755, 3108, 914, 1462, 1682, 1828, 1024, 8301, 4681], XLS_K = 2706;      // A … J, and K
+const XLS_MM = XLS_W.map((w) => Math.floor((w + 18) * 7 / 256) * 25.4 / 96);                   // what Excel draws at 100 %: 31, 48, 85 … px
+const COL = XLS_MM.slice(0, 7).concat(XLS_MM[7] + XLS_MM[8], XLS_MM[9]);                        // A B C D E F G H–I J in mm
+const TABLE_W = COL.reduce((t, w) => t + w, 0);                                                // 187.3 mm
+PAGE.ML = (PAGE.W - TABLE_W) / 2;
+// summary table under it: the label spans A–C, the first type D–E, then F, then G, as in the workbook;
+// types added later each take another column as wide as G
+const SUM_LABEL = COL[0] + COL[1] + COL[2], SUM_W = (i) => (i === 0 ? COL[3] + COL[4] : i === 1 ? COL[5] : COL[6]), PAD = 1.1;
+const sumWidth = (n) => { let t = SUM_LABEL; for (let i = 0; i < n; i++) t += SUM_W(i); return t; };
+const SCHED_LIST = ['SCHEDULE', 'UNSCHEDULE'];
+const ROW_MAX = 16.5 * PT, ROW_MIN = 14 * PT, SPACER_MIN = 0.4;
+const workAlign = (l) => (/^\s*\d+(?:[.)]|\s|$)/.test(l) ? 'left' : 'center');
+function buildModel(r, rev) {
+  const blocks = config.aircraft.map((a, idx) => {
+    const s = r.ac[a.id], H = trimTail(s.work), G = trimTail(s.eng.map((e) => e.trim())), J = [];
+    const ct = checkText(a, s), pt = fmtRange(s.from, s.to);
+    if (ct) J.push(ct);
+    if (pt) J.push(pt);
+    trimTail(s.notes).forEach((n) => J.push(n));
+    return { a, s, no: idx + 1, H, G, J, n: Math.max(2, H.length, G.length, J.length) };
+  });
+  const signs = r.sign.map((g) => {
+    const pos = trimTail(g.pos);
+    return (g.rank.trim() || g.name.trim() || pos.length) ? { rank: g.rank.trim(), name: g.name.trim(), pos, day: signDay(g), my: signMY(g, r) } : null;
+  });
+  let signRows = 1;
+  signs.forEach((g) => { if (g) signRows += 4 + g.pos.length + 1; });
+  const tail = Math.max(config.sumRows.length + 1, signRows);
+  const R = 3 + blocks.reduce((t, b) => t + b.n, 0) + tail, S = Math.max(0, blocks.length - 1), avail = PAGE.H - PAGE.MT - PAGE.MB;
+  let rowH = Math.min(ROW_MAX, avail / (R + S)), spH = rowH, scale = 1;
+  if (rowH < ROW_MIN) {                                       // keep 12 pt type: squeeze the blank rows between aircraft first
+    rowH = ROW_MIN; spH = S ? (avail - R * ROW_MIN) / S : 0;
+    if (spH < SPACER_MIN * ROW_MIN) { scale = avail / (R * ROW_MIN + S * SPACER_MIN * ROW_MIN); rowH = ROW_MIN * scale; spH = SPACER_MIN * ROW_MIN * scale; }
+  }
+  return { r, rev: rev || 0, blocks, signs, R, S, rowH, spH, scale, fits: scale === 1 };
+}
+const capacity = (m) => Math.floor((PAGE.H - PAGE.MT - PAGE.MB) / ROW_MIN - SPACER_MIN * m.S + 1e-9);
+
+function drawPage(canvas, model) {
+  const ctx = canvas.getContext('2d'), r = model.r;
+  const k = canvas.width / PAGE.W, rh = model.rowH, fpx = FONT_MM * model.scale * k;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#000000'; ctx.strokeStyle = '#000000';
+  const lw = Math.max(1, Math.round(0.2 * k)), off = (lw % 2) / 2;
+  ctx.lineWidth = lw; ctx.lineCap = 'square';
+  const px = (mm) => Math.round(mm * k) + off;
+  const line = (x1, y1, x2, y2) => { ctx.beginPath(); ctx.moveTo(px(x1), px(y1)); ctx.lineTo(px(x2), px(y2)); ctx.stroke(); };
+  const vm = {};
+  // fit: by default the type narrows to the cell; 'clip' keeps the size and cuts what does not fit;
+  // 'min8' narrows that one cell down to 8 pt at most, then cuts what still does not fit
+  function text(s, x, y, w, o) {
+    s = str(s); if (!s.trim()) return;
+    o = o || {};
+    const pad = o.pad == null ? PAD : o.pad, weight = o.bold ? '700 ' : '400 ';
+    let align = o.align || 'center', size = fpx;
+    ctx.font = weight + size + 'px ' + DOC_FONT;
+    const maxW = (w - 2 * pad) * k, tw = textWidth(ctx, s, size, !!o.bold), over = tw > maxW && maxW > 0;
+    let clip = over && o.fit === 'clip', f = 1;             // f: how far the type is narrowed
+    if (over && o.fit === 'min8') { f = Math.max(maxW / tw, 8 / 12); clip = tw * f > maxW + 0.5; }
+    else if (over && !clip) f = maxW / tw;
+    if (f !== 1) { size *= f; ctx.font = weight + size + 'px ' + DOC_FONT; }
+    if (!vm[weight]) {
+      ctx.save(); ctx.font = weight + '100px ' + DOC_FONT;
+      const m = ctx.measureText('กูป่ำ Ag');
+      vm[weight] = { a: (m.fontBoundingBoxAscent || 85) / 100, d: (m.fontBoundingBoxDescent == null ? 25 : m.fontBoundingBoxDescent) / 100 };
+      ctx.restore();
+    }
+    const base = y * k + (rh * k + (vm[weight].a - vm[weight].d) * size) / 2;
+    ctx.textBaseline = 'alphabetic';
+    if (clip) { ctx.save(); ctx.beginPath(); ctx.rect((x + pad) * k, (y - rh) * k, maxW, rh * 3 * k); ctx.clip(); align = 'left'; }
+    ctx.textAlign = 'left';                                 // always from the left edge (see textWidth)
+    ctx.fillText(s, align === 'left' ? (x + pad) * k : align === 'right' ? (x + w - pad) * k - tw * f : (x + w / 2) * k - tw * f / 2, base);
+    if (clip) ctx.restore();
+  }
+
+  const X = [PAGE.ML];
+  COL.forEach((w) => X.push(X[X.length - 1] + w));
+  const x0 = X[0], x1 = X[9];
+  let y = PAGE.MT;
+  text(title1(r, model.rev), x0, y, x1 - x0, { bold: true }); y += rh;
+  text(title2(r), x0, y, x1 - x0, { bold: true }); y += rh;
+  const yH = y;
+  [['ลำดับ', 0, 1], ['บ.แบบ', 1, 2], ['หมายเลข', 2, 3], ['สถานภาพ', 3, 5], ['เวลา บ.', 5, 6], ['เวลา ย.', 6, 7], ['การปฏิบัติและข้อขัดข้อง', 7, 8], ['หมายเหตุ', 8, 9]]
+    .forEach(([t, a, b]) => text(t, X[a], y, X[b] - X[a], { bold: true, pad: 0.5 }));
+  y += rh;
+  const yB = y;
+  model.blocks.forEach((b, bi) => {
+    const { a, s } = b;
+    text(b.no, X[0], y, COL[0]);
+    text(a.type, X[1], y, COL[1], { pad: 0.6 });
+    text(a.tail, X[2], y, COL[2]);
+    text('(' + a.serial + ')', X[2], y + rh, COL[2]);
+    text(s.mark.trim(), X[3], y, COL[3], { pad: 0.4 });
+    text(s.status.trim(), X[4], y, COL[4], { pad: 0.5 });
+    text(s.sched.trim(), X[4], y + rh, COL[4], SCHED_LIST.includes(s.sched.trim()) ? { pad: 0.5 } : { pad: 0.5, fit: 'min8' });   // a listed choice always shows whole
+    text(s.af.trim(), X[5], y, COL[5], { pad: 0.7 });
+    b.G.forEach((g, i) => text(g, X[6], y + i * rh, COL[6], { pad: 0.7 }));
+    b.H.forEach((l, i) => text(l, X[7], y + i * rh, COL[7], { align: workAlign(l), fit: 'min8' }));
+    b.J.forEach((l, i) => text(l, X[8], y + i * rh, COL[8], { fit: 'min8' }));
+    y += b.n * rh + (bi < model.blocks.length - 1 ? model.spH : 0);
+  });
+  const yE = y;
+  line(x0, yH, x1, yH); line(x0, yB, x1, yB); line(x0, yE, x1, yE);
+  X.forEach((x, i) => { if (i !== 4) line(x, yH, x, yE); });
+  line(X[4], yB, X[4], yE);
+
+  const SX = [x0, x0 + SUM_LABEL];
+  config.sumCols.forEach((c, i) => SX.push(SX[SX.length - 1] + SUM_W(i)));
+  const sEnd = SX[SX.length - 1];
+  text('บ.แบบ', SX[0], y, SUM_LABEL, { bold: true });
+  config.sumCols.forEach((c, i) => text(c.label, SX[i + 1], y, SUM_W(i), { bold: true, pad: 0.5, fit: 'clip' }));
+  config.sumRows.forEach((row, ri) => {
+    const yr = y + (ri + 1) * rh;
+    text(rowLabel(row, r), SX[0] + 0.45, yr, SUM_LABEL - 0.45, { align: 'left', pad: 0.05, fit: 'clip' });   // starts 0.5 mm in, as Excel does, and may run up to the next line
+    config.sumCols.forEach((c, i) => text(sumValue(r, row, c.id), SX[i + 1], yr, SUM_W(i), { pad: 0.6, fit: 'clip' }));
+  });
+  const nS = config.sumRows.length + 1;
+  for (let i = 1; i <= nS; i++) line(SX[0], y + i * rh, sEnd, y + i * rh);
+  SX.forEach((x) => line(x, y, x, y + nS * rh));
+
+  const sw = x1 - sEnd - 2, cx = sEnd + 2 + sw / 2;
+  let ys = y + rh;
+  model.signs.forEach((g) => {
+    if (!g) return;
+    text('ทราบแล้ว', cx - 30, ys, 28, { align: 'left', pad: 0 }); ys += rh;
+    text(g.rank, cx - 38, ys, 26, { align: 'right', pad: 0 }); ys += rh;
+    text(g.name ? '(' + g.name + ')' : '', cx - sw / 2, ys, sw); ys += rh;
+    g.pos.forEach((p) => { text(p, cx - sw / 2, ys, sw, { fit: 'clip' }); ys += rh; });
+    text(g.my, cx - 6, ys, 40, { align: 'left', pad: 0 });          // month and year stay put whether or not a day is given
+    text(g.day, cx - 19.2, ys, 12, { align: 'right', pad: 0 }); ys += 2 * rh;
+  });
+}
+async function fontsReady() {
+  try { await Promise.race([Promise.all([document.fonts.load('400 20px "TH SarabunPSK"', 'ก A'), document.fonts.load('700 20px "TH SarabunPSK"', 'ก A')]), new Promise((res) => setTimeout(res, 3000))]); }
+  catch (e) { /* fall back to the next face in the stack */ }
+}
+function renderPreview() {
+  const model = buildModel(work, curRev());
+  drawPage($('paper'), model);
+  $('pv-meta').textContent = 'A4 แนวตั้ง 210 × 297 มม. · ใช้ ' + model.R + ' จาก ' + capacity(model) + ' บรรทัด · TH SarabunPSK ' + (12 * model.scale).toFixed(model.scale === 1 ? 0 : 1) + ' pt';
+  const warn = $('pv-warn');
+  warn.hidden = model.fits;
+  if (!model.fits) warn.textContent = 'ข้อมูลเกินหนึ่งหน้า A4 ตัวอย่างนี้ถูกย่อให้เห็นทั้งหมด แต่จะ PRINT TO PDF และ SAVE ไม่ได้จนกว่าจะลดบรรทัดข้อขัดข้อง แถวสรุป หรือเครื่องบิน';
+}
+function showPanel(name) {
+  const pv = name === 'preview', sv = name === 'saved', hs = name === 'hist';
+  $('panel-edit').hidden = pv || sv || hs; $('panel-preview').hidden = !pv; $('panel-saved').hidden = !sv; $('panel-hist').hidden = !hs;
+  document.querySelector('.actions').hidden = sv || hs;     // the saved page and the look-back page have their own buttons
+  $('btn-preview').textContent = pv ? 'กลับไปแก้ไข' : 'PREVIEW';
+  $('btn-preview').dataset.act = pv ? 'back' : 'preview';
+  if (pv) { renderPreview(); fontsReady().then(() => { if (!$('panel-preview').hidden) renderPreview(); }); }
+  if (sv) { const draw = () => drawPage($('paper2'), buildModel(work, curRev())); draw(); fontsReady().then(() => { if (!$('panel-saved').hidden) draw(); }); }
+  if (pv || sv || hs) window.scrollTo(0, 0);
+}
+
+/* ====================== PDF (one A4 page, 600 dpi) ====================== */
+async function buildPdf(canvas, title) {
+  const W = canvas.width, H = canvas.height;
+  let img, filter, cs;
+  if (typeof CompressionStream === 'function') {
+    const ctx = canvas.getContext('2d'), gray = new Uint8Array(W * H), STRIP = 256;
+    for (let y = 0, j = 0; y < H; y += STRIP) {             // read in strips to keep memory low at 600 dpi
+      const d = ctx.getImageData(0, y, W, Math.min(STRIP, H - y)).data;
+      for (let i = 0; i < d.length; i += 4) gray[j++] = (d[i] * 77 + d[i + 1] * 150 + d[i + 2] * 29) >> 8;
+    }
+    const z = new Blob([gray]).stream().pipeThrough(new CompressionStream('deflate'));
+    img = new Uint8Array(await new Response(z).arrayBuffer()); filter = '/FlateDecode'; cs = '/DeviceGray';
+  } else {
+    const blob = await new Promise((res) => canvas.toBlob(res, 'image/jpeg', 0.95));
+    img = new Uint8Array(await blob.arrayBuffer()); filter = '/DCTDecode'; cs = '/DeviceRGB';
+  }
+  const enc = new TextEncoder(), parts = [], offsets = [];
+  let len = 0;
+  const put = (x) => { const b = typeof x === 'string' ? enc.encode(x) : x; parts.push(b); len += b.length; };
+  const obj = (n, body) => { offsets[n] = len; put(n + ' 0 obj\n'); body(); put('\nendobj\n'); };
+  const hex = 'FEFF' + Array.from(title, (c) => c.charCodeAt(0).toString(16).padStart(4, '0')).join('').toUpperCase();
+  const content = 'q 595.276 0 0 841.89 0 0 cm /Im0 Do Q';
+  put('%PDF-1.4\n%âãÏÓ\n');
+  obj(1, () => put('<< /Type /Catalog /Pages 2 0 R >>'));
+  obj(2, () => put('<< /Type /Pages /Kids [3 0 R] /Count 1 >>'));
+  obj(3, () => put('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.276 841.89] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>'));
+  obj(4, () => { put('<< /Type /XObject /Subtype /Image /Width ' + W + ' /Height ' + H + ' /ColorSpace ' + cs + ' /BitsPerComponent 8 /Filter ' + filter + ' /Length ' + img.length + ' >>\nstream\n'); put(img); put('\nendstream'); });
+  obj(5, () => put('<< /Length ' + content.length + ' >>\nstream\n' + content + '\nendstream'));
+  obj(6, () => put('<< /Title <' + hex + '> /Producer (Daily aircraft status form) >>'));
+  const xref = len;
+  let x = 'xref\n0 7\n0000000000 65535 f \n';
+  for (let n = 1; n <= 6; n++) x += String(offsets[n]).padStart(10, '0') + ' 00000 n \n';
+  put(x + 'trailer\n<< /Size 7 /Root 1 0 R /Info 6 0 R >>\nstartxref\n' + xref + '\n%%EOF\n');
+  return new Blob(parts, { type: 'application/pdf' });
+}
+
+/* ====================== Excel (.xlsx) with the hidden link column K ====================== */
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(b) { let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function zipStore(files) {
+  const enc = new TextEncoder(), chunks = [], central = [];
+  let off = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name), data = enc.encode(f.text), crc = crc32(data);
+    const h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(12, 0x21, true);
+    h.setUint32(14, crc, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true); h.setUint16(26, name.length, true);
+    chunks.push(new Uint8Array(h.buffer), name, data);
+    const c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(14, 0x21, true);
+    c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true); c.setUint16(28, name.length, true); c.setUint32(42, off, true);
+    central.push(new Uint8Array(c.buffer), name);
+    off += 30 + name.length + data.length;
+  }
+  const cdSize = central.reduce((t, b) => t + b.length, 0), e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, cdSize, true); e.setUint32(16, off, true);
+  return new Blob(chunks.concat(central, [new Uint8Array(e.buffer)]), { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+const colName = (i) => { let s = ''; for (i += 1; i > 0; i = Math.floor((i - 1) / 26)) s = String.fromCharCode(65 + (i - 1) % 26) + s; return s; };
+const dateSerial = (iso) => { const d = parseISO(iso); return d ? d.t / 86400000 + 25569 : null; };
+
+function xlsxTools() {
+  const xfs = [], xfIndex = {}, fonts = [], fontIndex = {}, BORDER = { none: 0, all: 1, lr: 2, lrb: 3 }, FMT = { gen: 0, one: 164, date: 14 };
+  function fontOf(o) { const key = (o.bold ? 'b' : 'r') + (o.sz || 12); if (!(key in fontIndex)) { fontIndex[key] = fonts.length; fonts.push({ bold: !!o.bold, sz: o.sz || 12 }); } return fontIndex[key]; }
+  fontOf({}); fontOf({ bold: true });
+  function sty(o) { const key = [o.bold ? 1 : 0, o.align || 'center', o.border || 'none', o.fmt || 'gen', o.sz || 12, o.shrink ? 1 : 0].join('|'); if (!(key in xfIndex)) { xfIndex[key] = xfs.length; xfs.push(o); } return xfIndex[key]; }
+  sty({ align: 'general' });
+  function cell(ref, v, o) {
+    const s = sty(o || {});
+    if (v && typeof v === 'object' && v.f) return '<c r="' + ref + '" s="' + s + '"><f>' + v.f + '</f><v>' + v.v + '</v></c>';
+    if (typeof v === 'number') return '<c r="' + ref + '" s="' + s + '"><v>' + v + '</v></c>';
+    v = str(v);
+    if (v === '') return '<c r="' + ref + '" s="' + s + '"/>';
+    return '<c r="' + ref + '" s="' + s + '" t="inlineStr"><is><t xml:space="preserve">' + esc(v) + '</t></is></c>';
+  }
+  // numbers typed as text become real numbers so other files can calculate with them
+  function val(v, o) { v = str(v).trim(); if (isNum(v)) { const o2 = Object.assign({}, o); if (/^\d+\.\d$/.test(v)) o2.fmt = 'one'; return [Number(v), o2]; } return [v, o]; }
+  const NS = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"', REL = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+  const X = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>', PKG = 'http://schemas.openxmlformats.org/package/2006/', CT = 'application/vnd.openxmlformats-officedocument.spreadsheetml.';
+  // sheets: [{ name, xml }]; extra: workbook XML that follows <sheets>, such as defined names
+  function pack(sheets, extra) {
+    const side = '<left style="thin"><color auto="1"/></left><right style="thin"><color auto="1"/></right>';
+    const borders = ['<border><left/><right/><top/><bottom/><diagonal/></border>',
+      '<border>' + side + '<top style="thin"><color auto="1"/></top><bottom style="thin"><color auto="1"/></bottom><diagonal/></border>',
+      '<border>' + side + '<top/><bottom/><diagonal/></border>',
+      '<border>' + side + '<top/><bottom style="thin"><color auto="1"/></bottom><diagonal/></border>'];
+    // font 0 is the workbook's default (Calibri 11, as in the original): Excel counts column widths in its digits,
+    // so the widths read the same on every machine; every cell itself is set in TH SarabunPSK
+    const xfXml = xfs.map((o) => '<xf numFmtId="' + FMT[o.fmt || 'gen'] + '" fontId="' + (fontOf(o) + 1) + '" fillId="0" borderId="' + BORDER[o.border || 'none']
+      + '" xfId="0" applyNumberFormat="1" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="' + (o.align || 'center') + '" vertical="center"' + (o.shrink ? ' shrinkToFit="1"' : '') + '/></xf>').join('');
+    const styles = X + '<styleSheet ' + NS + '><numFmts count="1"><numFmt numFmtId="164" formatCode="0.0"/></numFmts>'
+      + '<fonts count="' + (fonts.length + 1) + '"><font><sz val="11"/><name val="Calibri"/><family val="2"/></font>' + fonts.map((f) => '<font>' + (f.bold ? '<b/>' : '') + '<sz val="' + f.sz + '"/><name val="TH SarabunPSK"/></font>').join('') + '</fonts>'
+      + '<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>'
+      + '<borders count="4">' + borders.join('') + '</borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+      + '<cellXfs count="' + xfs.length + '">' + xfXml + '</cellXfs>'
+      + '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+    return zipStore([
+      { name: '[Content_Types].xml', text: X + '<Types xmlns="' + PKG + 'content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="' + CT + 'sheet.main+xml"/>'
+        + sheets.map((sh, i) => '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="' + CT + 'worksheet+xml"/>').join('') + '<Override PartName="/xl/styles.xml" ContentType="' + CT + 'styles+xml"/></Types>' },
+      { name: '_rels/.rels', text: X + '<Relationships xmlns="' + PKG + 'relationships"><Relationship Id="rId1" Type="' + REL + '/officeDocument" Target="xl/workbook.xml"/></Relationships>' },
+      { name: 'xl/workbook.xml', text: X + '<workbook ' + NS + ' xmlns:r="' + REL + '"><sheets>' + sheets.map((sh, i) => '<sheet name="' + esc(sh.name) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>').join('') + '</sheets>' + (extra || '') + '</workbook>' },
+      { name: 'xl/_rels/workbook.xml.rels', text: X + '<Relationships xmlns="' + PKG + 'relationships">' + sheets.map((sh, i) => '<Relationship Id="rId' + (i + 1) + '" Type="' + REL + '/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>').join('')
+        + '<Relationship Id="rId' + (sheets.length + 1) + '" Type="' + REL + '/styles" Target="styles.xml"/></Relationships>' },
+      { name: 'xl/styles.xml', text: styles },
+    ].concat(sheets.map((sh, i) => ({ name: 'xl/worksheets/sheet' + (i + 1) + '.xml', text: sh.xml }))));
+  }
+  return { cell, val, NS, X, pack };
+}
+
+// every SAVE as rows: one row per aircraft on DATABASE, one row per summary line on SUMMARY
+function buildDbXlsx(entries) {
+  const { cell, val, NS, X, pack } = xlsxTools(), L = { align: 'left' }, D = { fmt: 'date' };
+  const sheet = (head, rows, wide) => {
+    const xr = ['<row r="1">' + head.map((t, i) => cell(colName(i) + '1', t, { bold: true, border: 'all' })).join('') + '</row>'];
+    rows.forEach((cells, n) => { xr.push('<row r="' + (n + 2) + '">' + cells.map((c, i) => cell(colName(i) + (n + 2), c[0], c[1] || {})).join('') + '</row>'); });
+    return X + '<worksheet ' + NS + '><dimension ref="A1:' + colName(head.length - 1) + (rows.length + 1) + '"/><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
+      + '<cols>' + head.map((t, i) => '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + (wide[i] || 15) + '" customWidth="1"/>').join('') + '</cols><sheetData>' + xr.join('') + '</sheetData></worksheet>';
+  };
+  const day = (iso) => { const d = dateSerial(iso); return [d == null ? '' : d, D]; };
+  const maxEng = Math.max(4, ...config.aircraft.map((a) => a.eng));
+  const head = ['วันที่รายงาน (เริ่ม)', 'ถึงวันที่', 'REV', 'บันทึกเมื่อ', 'รหัส บ.', 'บ.แบบ', 'หมายเลข', 'หมายเลขในวงเล็บ', 'เครื่องหมาย', 'สถานภาพ', 'ประเภท', 'เวลา บ.'];
+  for (let e = 1; e <= maxEng; e++) head.push('เวลา ย. ENG.' + e, 'หมายเลข ย. ENG.' + e);
+  head.push('ชื่อ CHECK ที่พิมพ์', 'ประเภท CHECK', 'เลขครั้ง C', 'เริ่มซ่อมบำรุง', 'สิ้นสุดซ่อมบำรุง', 'หมายเหตุอื่นๆ', 'การปฏิบัติและข้อขัดข้อง');
+  const rows = [], sums = [];
+  for (const e of entries) {
+    const r = normReport(e.report), rev = [Math.max(0, Math.round(+e.rev) || 0)], at = [e.savedAt ? stampOf(new Date(e.savedAt)).text : '', L];
+    for (const a of config.aircraft) {
+      const s = r.ac[a.id], c = [day(r.dateFrom), day(r.dateTo), rev, at, [a.key, L], [a.type, L], [a.tail, L], [a.serial, L], [s.mark.trim()], [s.status.trim(), L], [s.sched.trim(), L], val(s.af, {})];
+      for (let i = 0; i < maxEng; i++) c.push(val(s.eng[i] || '', {}), [str(s.sn[i]).trim(), L]);
+      c.push([checkText(a, s), L], [s.check.trim(), L], val(s.check.trim() === heavyOf(a) ? s.cnum : '', {}), day(s.from), day(s.to), [trimTail(s.notes).join(' / '), L], [trimTail(s.work).join(' / '), L]);
+      rows.push(c);
+    }
+    for (const row of config.sumRows) sums.push([day(r.dateFrom), rev, [rowLabel(row, r), L]].concat(config.sumCols.map((col) => val(sumValue(r, row, col.id), {}))));
+  }
+  const wide = head.map((t, i) => (i === head.length - 1 ? 70 : i === head.length - 2 ? 30 : i === 3 ? 26 : 15));
+  return pack([{ name: 'DATABASE', xml: sheet(head, rows, wide) }, { name: 'SUMMARY', xml: sheet(['วันที่รายงาน (เริ่ม)', 'REV', 'รายการ'].concat(config.sumCols.map((c) => c.label)), sums, [18, 8, 40]) }]);
+}
+
+// a work line too long for its cell is set smaller in that cell alone, in half points and never under 8 pt
+function fitPt(l, room) { const w = measureMM(str(l).replace(/\s+$/, '')), max = (room || COL[7] - 2 * PAD) * 0.97; return w > max ? Math.max(8, Math.floor(24 * max / w) / 2) : 12; }
+function buildXlsx(rep, rev) {
+  const { cell, val, NS, pack } = xlsxTools();
+  const r = rep || work, model = buildModel(r, rev), extra = config.sumCols.length > 3;
+  const rowsXml = [], merges = ['A1:J1', 'A2:J2', 'D3:E3', 'H3:I3'];
+  const row = (n, cells) => rowsXml.push('<row r="' + n + '" ht="16.5" customHeight="1">' + cells.join('') + '</row>');
+  row(1, [cell('A1', title1(r, model.rev), { bold: true })]);
+  row(2, [cell('A2', title2(r), { bold: true })]);
+  row(3, ['ลำดับ', 'บ.แบบ', 'หมายเลข', 'สถานภาพ', '', 'เวลา บ.', 'เวลา ย.', 'การปฏิบัติและข้อขัดข้อง', '', 'หมายเหตุ', 'รหัส บ.'].map((t, i) => cell(colName(i) + '3', t, { bold: true, border: i < 10 ? 'all' : 'none', shrink: i < 10 })));
+  let n = 4;
+  model.blocks.forEach((b, bi) => {
+    const last = bi === model.blocks.length - 1, total = b.n + (last ? 0 : 1);
+    for (let i = 0; i < total; i++, n++) {
+      // narrow cells shrink their text to fit, as the page does (Excel's own "shrink to fit"); the cells with an 8 pt floor get their size worked out here
+      const border = (last && i === total - 1) ? 'lrb' : 'lr', c = { border }, cs = { border, shrink: true }, hl = b.H[i] || '', sched = b.s.sched.trim();
+      row(n, [
+        cell('A' + n, i === 0 ? b.no : '', cs), cell('B' + n, i === 0 ? b.a.type : '', cs), cell('C' + n, i === 0 ? b.a.tail : (i === 1 ? '(' + b.a.serial + ')' : ''), cs),
+        cell('D' + n, i === 0 ? b.s.mark.trim() : '', cs), cell('E' + n, i === 0 ? b.s.status.trim() : (i === 1 ? sched : ''), i === 1 && !SCHED_LIST.includes(sched) ? { border, sz: fitPt(sched, COL[4] - 1) } : cs),
+        cell('F' + n, ...val(i === 0 ? b.s.af : '', cs)), cell('G' + n, ...val(b.G[i] || '', cs)),
+        cell('H' + n, hl, { border, align: workAlign(hl), sz: fitPt(hl) }), cell('I' + n, '', c), cell('J' + n, b.J[i] || '', { border, sz: fitPt(b.J[i] || '', COL[8] - 2 * PAD) }), cell('K' + n, i === 0 ? b.a.key : '', {}),
+      ]);
+      merges.push('H' + n + ':I' + n);
+    }
+  });
+  const sumTop = n, all = { border: 'all' }, head = { bold: true, border: 'all' };
+  // summary columns: the first three sit where the original sheet has them (D:E, F, G); any added ones follow in H, I
+  const SC = ['D', 'F', 'G', 'H', 'I'];
+  const signCol = extra ? 'J' : 'H', signText = {};
+  let sr = n + 1;
+  model.signs.forEach((g) => { if (!g) return; ['ทราบแล้ว', g.rank, g.name ? '(' + g.name + ')' : ''].concat(g.pos, [(g.day || '').padStart(2, ' ') + ' ' + g.my]).forEach((t) => { signText[sr++] = t; }); sr++; });
+  const sumRowCells = (label, labelStyle, vals, valStyle) => {
+    const cells = [cell('A' + n, label, labelStyle), cell('B' + n, '', all), cell('C' + n, '', all)];
+    config.sumCols.forEach((c, i) => { const v = vals(c, i); cells.push(cell(SC[i] + n, v[0], v[1] || valStyle)); if (i === 0) cells.push(cell('E' + n, '', all)); });
+    if (signText[n]) { cells.push(cell(signCol + n, signText[n], {})); if (!extra) merges.push('H' + n + ':J' + n); }
+    merges.push('A' + n + ':C' + n, 'D' + n + ':E' + n);
+    cells.sort((a, b) => { const ca = /r="([A-Z]+)/.exec(a)[1], cb = /r="([A-Z]+)/.exec(b)[1]; return ca.length - cb.length || (ca < cb ? -1 : ca > cb ? 1 : 0); });
+    row(n, cells); n++;
+  };
+  sumRowCells('บ.แบบ', head, (c) => [c.label, head]);
+  const rowAt = {}; config.sumRows.forEach((q, i) => { rowAt[q.id] = sumTop + 1 + i; });
+  config.sumRows.forEach((q) => {
+    sumRowCells(rowLabel(q, r), { border: 'all', align: 'left' }, (c, i) => {
+      if (q.total) { const refs = config.sumRows.filter((x) => x.sum).map((x) => SC[i] + rowAt[x.id]); return [refs.length ? { f: refs.join('+'), v: sumTotal(r, c.id) } : sumTotal(r, c.id), { border: 'all', fmt: 'one' }]; }
+      return val(r.sum[q.id][c.id], all);
+    });
+  });
+  for (; n < sr; n++) { if (signText[n]) { row(n, [cell(signCol + n, signText[n], {})]); if (!extra) merges.push('H' + n + ':J' + n); } }
+  const lastRow = n - 1;
+  const cols = XLS_W.map((w, i) => '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w / 256 + '" customWidth="1"/>').join('') + '<col min="11" max="11" width="' + XLS_K / 256 + '" customWidth="1" hidden="1"/>';
+  const sheet1 = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet ' + NS + '><sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>'
+    + '<dimension ref="A1:K' + lastRow + '"/><sheetViews><sheetView workbookViewId="0" tabSelected="1"/></sheetViews><sheetFormatPr defaultRowHeight="16.5"/>'
+    + '<cols>' + cols + '</cols><sheetData>' + rowsXml.join('') + '</sheetData>'
+    + '<mergeCells count="' + merges.length + '">' + merges.map((m) => '<mergeCell ref="' + m + '"/>').join('') + '</mergeCells>'
+    + '<printOptions horizontalCentered="1"/><pageMargins left="0.31" right="0.31" top="0.24" bottom="0.24" header="0" footer="0"/>'
+    + '<pageSetup paperSize="9" orientation="portrait" fitToWidth="1" fitToHeight="1"/></worksheet>';
+
+  // sheet 2: one row per aircraft, keyed by the link code, including the engine numbers that are not printed
+  const maxEng = Math.max(4, ...config.aircraft.map((a) => a.eng));
+  const LH = ['รหัส บ.', 'ลำดับ', 'บ.แบบ', 'หมายเลข', 'หมายเลขในวงเล็บ', 'เครื่องหมาย', 'สถานภาพ', 'ประเภท', 'เวลา บ.'];
+  for (let e = 1; e <= maxEng; e++) LH.push('เวลา ย. ENG.' + e, 'หมายเลข ย. ENG.' + e);
+  LH.push('ชื่อ CHECK ที่พิมพ์', 'ประเภท CHECK', 'เลขครั้ง C', 'เริ่มซ่อมบำรุง', 'สิ้นสุดซ่อมบำรุง', 'ระยะเวลา (ข้อความ)', 'หมายเหตุอื่นๆ', 'การปฏิบัติและข้อขัดข้อง');
+  const lrows = ['<row r="1">' + LH.map((t, i) => cell(colName(i) + '1', t, { bold: true, border: 'all' })).join('') + '</row>'];
+  config.aircraft.forEach((a, idx) => {
+    const s = r.ac[a.id], rn = idx + 2, L = { align: 'left' }, d1 = dateSerial(s.from), d2 = dateSerial(s.to), c = [];
+    let ci = 0;
+    const put = (v, o) => { c.push(cell(colName(ci++) + rn, v, o || {})); };
+    put(a.key, L); put(idx + 1); put(a.type, L); put(a.tail, L); put(a.serial, L); put(s.mark.trim()); put(s.status.trim(), L); put(s.sched.trim(), L); put(...val(s.af, {}));
+    for (let e = 0; e < maxEng; e++) { put(...val(s.eng[e] || '', {})); put(str(s.sn[e]).trim(), L); }
+    put(checkText(a, s), L); put(s.check.trim(), L); put(...val(s.check.trim() === heavyOf(a) ? s.cnum : '', {}));
+    put(d1 == null ? '' : d1, { fmt: 'date' }); put(d2 == null ? '' : d2, { fmt: 'date' }); put(fmtRange(s.from, s.to), L); put(trimTail(s.notes).join(' / '), L); put(trimTail(s.work).join(' / '), L);
+    lrows.push('<row r="' + rn + '">' + c.join('') + '</row>');
+  });
+  const lw = LH.map((t, i) => (i === 0 ? 16 : i === LH.length - 1 ? 70 : i === LH.length - 2 ? 30 : i === LH.length - 3 ? 24 : 14));
+  const sheet2 = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet ' + NS + '><dimension ref="A1:' + colName(LH.length - 1) + (config.aircraft.length + 1) + '"/>'
+    + '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
+    + '<cols>' + lw.map((w, i) => '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>').join('') + '</cols><sheetData>' + lrows.join('') + '</sheetData></worksheet>';
+
+  const S1 = 'สภาพ บ.ประจำวัน';
+  return pack([{ name: S1, xml: sheet1 }, { name: 'LINK', xml: sheet2 }], '<definedNames><definedName name="_xlnm.Print_Area" localSheetId="0">\'' + S1 + '\'!$A$1:$J$' + lastRow + '</definedName></definedNames>');
+}
+
+/* ====================== handing files to the viewer ====================== */
+async function handOver(filename, blob) {
+  const dl = await pDl;
+  if (dl) {
+    try { await dl.save({ filename, data: blob }); return 'บันทึกไฟล์ ' + filename + ' แล้ว'; }
+    catch (e) {
+      const code = e && e.code;
+      if (code === 'declined') return 'ยกเลิกการบันทึกไฟล์';
+      if (code === 'rate_limited') return 'มีหน้าต่างยืนยันการบันทึกค้างอยู่ ตอบหน้าต่างนั้นก่อนแล้วกดอีกครั้ง';
+      return 'บันทึกไฟล์ในมุมมองนี้ไม่ได้ เปิดหน้านี้ใน Claude แล้วลองอีกครั้ง';
+    }
+  }
+  const url = URL.createObjectURL(blob), a = document.createElement('a');          // outside the Claude viewer: an ordinary browser download
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+  return 'สร้างไฟล์ ' + filename + ' แล้ว';
+}
+// draw the page at 600 dpi; if the device cannot hold a canvas that large the far corner stays unpainted, so fall back to 300
+function paperCanvas(model) {
+  for (const [w, h, dpi] of [[4961, 7016, 600], [2480, 3508, 300]]) {
+    try {
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const ctx = c.getContext('2d', { willReadFrequently: true });
+      if (!ctx) continue;
+      drawPage(c, model);
+      const px = ctx.getImageData(w - 1, h - 1, 1, 1).data;
+      if (px[0] === 255 && px[3] === 255) return { canvas: c, dpi };
+    } catch (e) { /* try the smaller size */ }
+  }
+  return null;
+}
+async function exportPdf() {
+  await fontsReady();
+  const rev = curRev(), made = paperCanvas(buildModel(work, rev));
+  if (!made) throw new Error('no canvas');
+  const msg = await handOver(fileName('pdf'), await buildPdf(made.canvas, title1(work, rev)));
+  return made.dpi === 600 ? msg : msg + ' (อุปกรณ์นี้สร้างได้ที่ 300 DPI)';
+}
+async function exportXlsx() { return handOver(fileName('xlsx'), buildXlsx(null, curRev())); }
+async function exportDb() {
+  let entries = [];
+  if (store) { const snap = await store.histAll(); entries = snap.docs.map((d) => d.data()); }
+  else entries = lsGet('hist') || [];
+  entries = entries.filter((e) => e && e.report && parseISO(e.report.dateFrom)).sort((a, b) => (a.report.dateFrom < b.report.dateFrom ? -1 : a.report.dateFrom > b.report.dateFrom ? 1 : (+a.rev || 0) - (+b.rev || 0)));
+  if (!entries.length) return 'ยังไม่มีรายงานที่ SAVE ไว้';
+  return handOver('DATABASE รายงานสถานภาพ บ. 602 ' + stampOf(new Date()).file + '.xlsx', buildDbXlsx(entries));
+}
+async function runInfo(btn, fn, infoId) {
+  const info = $(infoId || 'saved-info');
+  btn.disabled = true; info.textContent = 'กำลังสร้างไฟล์…';
+  try { info.textContent = (await fn()) || ''; } catch (e) { info.textContent = 'สร้างไฟล์ไม่สำเร็จ ลองอีกครั้ง'; }
+  btn.disabled = false;
+}
+async function withBusy(btn, fn) { btn.disabled = true; try { const msg = await fn(); if (msg) toast(msg); } catch (e) { toast('สร้างไฟล์ไม่สำเร็จ ลองอีกครั้ง'); } btn.disabled = false; }
+async function doPdf() {
+  await settled();
+  if (!await validate('pdf')) return;
+  await withBusy($('btn-pdf'), exportPdf);
+}
+async function doPreview() { await settled(); if (await validate('preview')) showPanel('preview'); }
+
+/* ====================== Google Sheet: the long-term database ======================
+   One main spreadsheet per fiscal year (1 Oct – 30 Sep, by the report's start date). Every SAVE is appended in one atomic request:
+   ARCHIVE holds the whole report plus the table layout of that day (what the look-back page redraws), DATA has one row per
+   aircraft and SUMMARY one row per summary value, for people to read and filter.
+   Each fiscal year also has a BACKUP spreadsheet, a separate file that only its owner can open: the same rows are appended there.
+   Nothing the page does to a main file touches a BACKUP file; a row leaves a BACKUP file only through the password-protected delete.
+   The page store keeps the queues of saves not yet sent, so a failed send never blocks SAVE.
+   Until a new fiscal year has its own main file, its saves wait in the latest earlier file and move over once the file is set. */
+const GS = 'Google Sheets', GS_TABS = ['ARCHIVE', 'DATA', 'SUMMARY'], GS_ID0 = { ARCHIVE: 60201, DATA: 60202, SUMMARY: 60203 };
+const GS_CHUNK = 40000, GS_PARTS = 4, GS_ENG = 8, GS_ABOUT = 'คำอธิบาย', GS_HIDDEN = ['ARCHIVE'], GS_KINDS = ['files', 'backups'];
+const GS_LOCK = 'เขียนโดยหน้า “สภาพ บ.ประจำวัน” เท่านั้น ถ้าแก้ไขด้วยมือ รายงานย้อนหลังอาจเรียกดูไม่ได้';
+const ID_RE = /^r\d{4}-\d{2}-\d{2}_\d{3,}$/;
+const GS_HEAD = {
+  ARCHIVE: ['รหัสบันทึก', 'วันที่รายงาน (เริ่ม)', 'ถึงวันที่', 'REV', 'บันทึกเมื่อ (เวลาไทย)', 'บันทึกเมื่อ (UTC)', 'จำนวนส่วน', 'ข้อมูล 1', 'ข้อมูล 2', 'ข้อมูล 3', 'ข้อมูล 4'],
+  DATA: (() => {
+    const h = ['รหัสบันทึก', 'วันที่รายงาน (เริ่ม)', 'ถึงวันที่', 'REV', 'บันทึกเมื่อ (เวลาไทย)', 'ลำดับ', 'รหัสเครื่องในระบบ', 'รหัส บ.', 'บ.แบบ', 'หมายเลข', 'หมายเลขในวงเล็บ', 'เครื่องหมาย', 'สถานภาพ', 'ประเภท', 'เวลา บ.'];
+    for (let e = 1; e <= GS_ENG; e++) h.push('เวลา ย. ENG.' + e, 'หมายเลข ย. ENG.' + e);
+    return h.concat(['ชื่อ CHECK ที่พิมพ์', 'ประเภท CHECK', 'เลขครั้ง C', 'เริ่มซ่อมบำรุง', 'สิ้นสุดซ่อมบำรุง', 'ระยะเวลา (ข้อความ)', 'หมายเหตุอื่นๆ', 'การปฏิบัติและข้อขัดข้อง']);
+  })(),
+  SUMMARY: ['รหัสบันทึก', 'วันที่รายงาน (เริ่ม)', 'REV', 'บันทึกเมื่อ (เวลาไทย)', 'ลำดับ', 'รหัสรายการ', 'รายการ', 'รหัส บ.แบบ', 'บ.แบบ', 'ค่า'],
+};
+let gsBusy = false, gsAgain = null, gsLast = null, gsWait = 0;
+
+function normSheets(o) {
+  o = (o && typeof o === 'object') ? o : {};
+  const g = { v: 3, files: {}, backups: {}, pending: [], bpending: [], parked: {}, bgone: {}, carry: {} }, tab = (v) => (Number.isInteger(v) && v >= 0 ? v : null), fileOk = (v) => /^[A-Za-z0-9_-]{20,}$/.test(str(v));
+  // files: the main file of each fiscal year; backups: its BACKUP file
+  for (const kind of GS_KINDS) if (o[kind] && typeof o[kind] === 'object') for (const fy in o[kind]) {
+    const f = o[kind][fy];
+    if (/^\d{2}$/.test(fy) && f && fileOk(f.id)) { const t = f.tabs || {}; g[kind][fy] = { id: str(f.id), name: str(f.name), tabs: {} }; GS_TABS.forEach((k) => { g[kind][fy].tabs[k] = tab(t[k]); }); }
+  }
+  // pending / bpending: saves not yet known to be in the main file / in the BACKUP file
+  for (const q of ['pending', 'bpending']) (Array.isArray(o[q]) ? o[q] : []).forEach((id) => { id = str(id); if (ID_RE.test(id) && !g[q].includes(id)) g[q].push(id); });
+  // parked: saves of a fiscal year that has no main file yet, and the file they wait in
+  if (o.parked && typeof o.parked === 'object') for (const id in o.parked) if (ID_RE.test(id) && fileOk(o.parked[id])) g.parked[id] = str(o.parked[id]);
+  // bgone: saves deleted from a BACKUP file on purpose; they are never backed up again
+  if (o.bgone && typeof o.bgone === 'object') for (const id in o.bgone) if (ID_RE.test(id)) g.bgone[id] = 1;
+  // carry: a fiscal year whose main file was replaced, and the old file its saves are still to be copied from
+  if (o.carry && typeof o.carry === 'object') for (const fy in o.carry) if (/^\d{2}$/.test(fy) && fileOk(o.carry[fy])) g.carry[fy] = str(o.carry[fy]);
+  return g;
+}
+const fyOfISO = (iso) => { const d = parseISO(iso); return d ? pad2((d.y + 543 + (d.m >= 10 ? 1 : 0)) % 100) : ''; };
+const fyPrev = (fy, d) => pad2((+fy + 100 - (d || 1)) % 100);
+const fySpan = (fy) => '1 ต.ค.' + fyPrev(fy) + ' – 30 ก.ย.' + fy;
+const histId = (key, count) => 'r' + key + '_' + String(count).padStart(3, '0');
+const structOf = (c) => ({ aircraft: clone(c.aircraft), sumCols: clone(c.sumCols), sumRows: clone(c.sumRows) });
+const fysOf = (id, kind) => Object.keys(sheets[kind || 'files']).filter((k) => sheets[kind || 'files'][k].id === id).sort();
+const fileOf = (id) => { const k = fysOf(id)[0]; return k ? sheets.files[k] : null; };                    // a main file
+const gsFile = (id) => fileOf(id) || (fysOf(id, 'backups')[0] ? sheets.backups[fysOf(id, 'backups')[0]] : null);   // a main or a BACKUP file
+// where a report of a fiscal year is written: its own file, or, until that file is set, the latest earlier one
+function gsHome(fy) {
+  if (!/^\d{2}$/.test(fy)) return null;
+  if (sheets.files[fy]) return { file: sheets.files[fy], parked: false, at: fy };
+  for (let d = 1; d <= 5; d++) { const k = fyPrev(fy, d); if (sheets.files[k]) return { file: sheets.files[k], parked: true, at: k }; }
+  return null;
+}
+// the table layout a report was saved under; entries saved before layouts were kept use today's
+function cfgOf(e) { return (e && Array.isArray(e.aircraft) && e.aircraft.length) ? normConfig({ aircraft: e.aircraft, sumCols: e.sumCols, sumRows: e.sumRows }) : config; }
+function withCfg(cfg, fn) { const keep = config; config = cfg; try { return fn(); } finally { config = keep; } }
+function thaiStamp(iso) {
+  const t = new Date(iso); if (isNaN(t)) return '';
+  const d = new Date(t.getTime() + 7 * 3600e3);
+  return d.getUTCFullYear() + '-' + pad2(d.getUTCMonth() + 1) + '-' + pad2(d.getUTCDate()) + ' ' + pad2(d.getUTCHours()) + ':' + pad2(d.getUTCMinutes());
+}
+const whenText = (iso) => { const t = new Date(iso); return isNaN(t) ? '' : stampOf(t).text; };
+
+// typed cells: text stays text ("1/47" never becomes a date), hours become real numbers
+const gsS = (v) => { v = str(v); return v === '' ? {} : { userEnteredValue: { stringValue: v } }; };
+const gsNum = (n) => ({ userEnteredValue: { numberValue: n } });
+const gsN = (v) => { v = str(v).trim(); return isNum(v) ? gsNum(Number(v)) : gsS(v); };
+function gsRows(e) {
+  const cfg = cfgOf(e);
+  return withCfg(cfg, () => {
+    const r = normReport(e.report), id = e.id, rev = Math.max(0, Math.round(+e.rev) || 0), at = thaiStamp(e.savedAt);
+    const snap = JSON.stringify({ v: 1, id, reportDate: r.dateFrom, rev, savedAt: str(e.savedAt), report: r, aircraft: cfg.aircraft, sumCols: cfg.sumCols, sumRows: cfg.sumRows });
+    const parts = [];
+    for (let i = 0; i < snap.length;) { let j = Math.min(snap.length, i + GS_CHUNK); const c = snap.charCodeAt(j - 1); if (j < snap.length && c >= 0xD800 && c <= 0xDBFF) j--; parts.push(snap.slice(i, j)); i = j; }
+    if (parts.length > GS_PARTS) throw { code: 'too_large' };
+    const archive = [[gsS(id), gsS(r.dateFrom), gsS(r.dateTo), gsNum(rev), gsS(at), gsS(e.savedAt), gsNum(parts.length)].concat(parts.map(gsS))];
+    const data = cfg.aircraft.map((a, idx) => {
+      const s = r.ac[a.id], c = [gsS(id), gsS(r.dateFrom), gsS(r.dateTo), gsNum(rev), gsS(at), gsNum(idx + 1), gsS(a.id), gsS(a.key), gsS(a.type), gsS(a.tail), gsS(a.serial), gsS(s.mark.trim()), gsS(s.status.trim()), gsS(s.sched.trim()), gsN(s.af)];
+      for (let i = 0; i < GS_ENG; i++) c.push(gsN(s.eng[i] || ''), gsS(str(s.sn[i]).trim()));
+      c.push(gsS(checkText(a, s)), gsS(s.check.trim()), gsN(s.check.trim() === heavyOf(a) ? s.cnum : ''), gsS(s.from), gsS(s.to), gsS(fmtRange(s.from, s.to)), gsS(trimTail(s.notes).join(' / ')), gsS(trimTail(s.work).join(' / ')));
+      return c;
+    });
+    const sum = [];
+    cfg.sumRows.forEach((row, ri) => cfg.sumCols.forEach((col) => {
+      const v = sumValue(r, row, col.id);
+      if (v !== '') sum.push([gsS(id), gsS(r.dateFrom), gsNum(rev), gsS(at), gsNum(ri + 1), gsS(row.id), gsS(rowLabel(row, r)), gsS(col.id), gsS(col.label), gsN(v)]);
+    }));
+    return { ARCHIVE: archive, DATA: data, SUMMARY: sum };
+  });
+}
+const gsAppendReq = (file, rows) => ['DATA', 'SUMMARY', 'ARCHIVE'].filter((t) => rows[t].length)
+  .map((t) => ({ appendCells: { sheetId: file.tabs[t], fields: 'userEnteredValue', rows: rows[t].map((c) => ({ values: c })) } }));
+
+async function gs(tool, input) {
+  const mcp = await pMcp;
+  if (!mcp) throw { code: 'capability_disabled' };
+  const r = await mcp.callTool(GS, tool, input, { cache: false });
+  let p = r ? r.payload : null;
+  if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
+  return (p && typeof p === 'object') ? p : {};
+}
+async function gsMeta(id) {
+  const p = await gs('get_spreadsheet', { spreadsheetId: id, fields: ['properties.title', 'sheets.properties'] });
+  if (!Array.isArray(p.sheets)) throw { code: 'upstream_error' };
+  return { name: str(p.properties && p.properties.title), tabs: p.sheets.map((x) => x.properties || {}) };
+}
+const gsA1 = (title, range) => "'" + str(title).replace(/'/g, "''") + "'!" + range;
+async function gsRead(id, range) {
+  const p = await gs('get_values', { spreadsheetId: id, range });
+  if (!('range' in p)) throw { code: 'upstream_error' };       // an answer without a range is not a real reading
+  return Array.isArray(p.values) ? p.values : [];
+}
+const gsColA = async (id, tab) => (await gsRead(id, tab + '!A:A')).map((r) => str(r[0]));
+const gsHeadCell = (v) => ({ userEnteredValue: { stringValue: v }, userEnteredFormat: { textFormat: { bold: true } } });
+const gsUrl = (id) => 'https://docs.google.com/spreadsheets/d/' + id + '/edit';
+
+// the first tab of each file: which fiscal year the file belongs to, who to contact, and how the page uses the file
+function gsAboutReq(sid, grid, fys, files, backup) {
+  const RED = { red: 1 }, YELLOW = { red: 1, green: 1 }, NAVY = { red: 0.1, green: 0.27, blue: 0.53 }, WINE = { red: 0.55, green: 0.1, blue: 0.12 }, WHITE = { red: 1, green: 1, blue: 1 };
+  const cell = (v, f, bg, wrap) => {
+    const c = v ? { userEnteredValue: v[0] === '=' ? { formulaValue: v } : { stringValue: v } } : {}, u = {};
+    if (f) u.textFormat = f;
+    if (bg) u.backgroundColorStyle = { rgbColor: bg };
+    if (wrap) { u.wrapStrategy = 'WRAP'; u.verticalAlignment = 'TOP'; }
+    if (f || bg || wrap) c.userEnteredFormat = u;
+    return c;
+  };
+  const band = (v, f, bg) => [cell(v, f, bg), cell('', null, bg), cell('', null, bg)];
+  const fyBand = { bold: true, fontSize: 22, foregroundColorStyle: { rgbColor: WHITE } }, warn = { bold: true, fontSize: 16, foregroundColorStyle: { rgbColor: RED } }, head = { bold: true, fontSize: 12 };
+  const pair = (a, b) => [cell(a, { bold: true }, null, true), cell(b, null, null, true)];
+  const span = fys.map((k) => k + ' (' + fySpan(k) + ')').join(' และ ');
+  const contact = [
+    band('ต้องการแก้ไขข้อมูล ติดต่อผู้ดูแลระบบ', warn, YELLOW),
+    band(__CONTACT_1__, warn, YELLOW),
+    band(__CONTACT_2__, warn, YELLOW),
+    band('ห้ามดำเนินการแก้ไขด้วยตนเอง', warn, YELLOW),
+  ];
+  const tabs = [
+    pair('DATA', 'หนึ่งแถวต่อเครื่องบินหนึ่งลำ ต่อการ SAVE หนึ่งครั้ง ใช้กรอง ค้นหา หรือทำกราฟได้'),
+    pair('SUMMARY', 'ตารางสรุปจำนวน บ. และ ชม.บิน หนึ่งแถวต่อหนึ่งค่าของหนึ่ง บ.แบบ ต่อการ SAVE หนึ่งครั้ง'),
+    pair('ARCHIVE', 'แท็บที่ซ่อนไว้ เก็บทั้งรายงานของการ SAVE แต่ละครั้ง หน้าเว็บใช้แท็บนี้แสดงรายงานย้อนหลังในรูปแบบเดิม'),
+  ];
+  let rows;
+  if (backup) rows = [
+    [cell('ฐานข้อมูลรายงานสถานภาพ บ. ประจำวัน ฝูง.602 บน.6', { bold: true, fontSize: 14 })],
+    band('ไฟล์ BACKUP ของปีงบประมาณ ' + span, fyBand, WINE),
+    [],
+  ].concat(contact, [
+    [],
+    [cell('ไฟล์นี้คืออะไร', head)],
+    pair('ชุดข้อมูลสำรอง', 'หน้า “สภาพ บ.ประจำวัน” เขียนข้อมูลชุดเดียวกับไฟล์หลักของปีงบประมาณนี้ต่อท้ายลงไฟล์นี้ทุกครั้งที่ SAVE'),
+    pair('การเข้าถึง', 'ไฟล์นี้ไม่แชร์ให้ผู้อื่น เปิดได้เฉพาะเจ้าของไฟล์ เมื่อผู้อื่นกด SAVE รายการจะรอ และถูกสำรองลงไฟล์นี้เมื่อเจ้าของไฟล์เปิดหน้าเว็บ'),
+    pair('ไม่ขึ้นกับไฟล์หลัก', 'การแก้ไขหรือลบข้อมูลในไฟล์หลักไม่มีผลกับไฟล์นี้'),
+    pair('การลบ', 'ลบรายการในไฟล์นี้ได้จากหน้าเว็บเท่านั้น (ดูย้อนหลัง แล้วเลือกแหล่งข้อมูลไฟล์ BACKUP) และต้องใช้รหัสของผู้ดูแลระบบ ห้ามลบหรือแก้ไขในไฟล์นี้ด้วยมือ'),
+    [],
+    [cell('แท็บในไฟล์นี้', head)],
+  ], tabs);
+  else {
+    rows = [
+      [cell('ฐานข้อมูลรายงานสถานภาพ บ. ประจำวัน ฝูง.602 บน.6', { bold: true, fontSize: 14 })],
+      band('ไฟล์นี้เป็นของปีงบประมาณ ' + span, fyBand, NAVY),
+      [],
+    ].concat(contact, [
+      [],
+      [cell('แท็บในไฟล์นี้', head)],
+    ], tabs, [
+      [],
+      [cell('การทำงานของ Template', head)],
+      pair('ทุกครั้งที่ SAVE', 'หน้า “สภาพ บ.ประจำวัน” เขียนต่อท้ายลงไฟล์ของปีงบประมาณนั้น (1 ต.ค. – 30 ก.ย.) ตามวันที่เริ่มต้นของรายงาน รายงานที่คร่อมปีงบประมาณเก็บในปีงบประมาณของวันที่เริ่มต้นเพียงที่เดียว'),
+      pair('หลัง SAVE', 'หน้า “บันทึกสำเร็จ” บอกว่าส่งขึ้น Google Sheet แล้วหรือไม่ ถ้าไม่สำเร็จจะบอกสาเหตุและมีปุ่ม “ส่งอีกครั้ง”'),
+      pair('ส่งไม่สำเร็จ', 'SAVE ยังสำเร็จตามปกติ รายงานเข้าคิวรอ และก่อนส่งซ้ำจะตรวจว่ามีแถวนั้นอยู่แล้วหรือยัง จึงไม่เกิดแถวซ้ำ'),
+      pair('ไฟล์ BACKUP', 'ข้อมูลชุดเดียวกันถูกเขียนลงไฟล์ BACKUP อีกไฟล์หนึ่ง ซึ่งเปิดได้เฉพาะเจ้าของไฟล์ การแก้ไขหรือลบข้อมูลในไฟล์นี้ไม่มีผลกับไฟล์ BACKUP'),
+      pair('ดูย้อนหลัง', 'กดปุ่ม “ดูย้อนหลัง” ในหน้าเว็บ รายงานจะแสดงในรูปแบบเดิมของวันที่บันทึก'),
+      pair('วิเคราะห์ข้อมูล', 'ทำในแท็บใหม่หรือไฟล์อื่นที่อ้างอิงมาที่แท็บ DATA และ SUMMARY'),
+      [],
+      [cell('ไฟล์ของแต่ละปีงบประมาณ', head)],
+    ]);
+    Object.keys(files).sort((a, b) => ((+a + 50) % 100) - ((+b + 50) % 100)).forEach((k) => {
+      rows.push([cell('ปีงบประมาณ ' + k, { bold: true }), fys.includes(k) ? cell('ไฟล์นี้') : cell('=HYPERLINK("' + gsUrl(files[k].id) + '","เปิดไฟล์ปีงบประมาณ ' + k + '")')]);
+    });
+  }
+  const haveR = (grid && grid.rowCount) || 0, haveC = (grid && grid.columnCount) || 0, end = Math.max(rows.length, Math.min(60, haveR)), req = [];
+  if (haveR < rows.length) req.push({ appendDimension: { sheetId: sid, dimension: 'ROWS', length: rows.length - haveR } });
+  if (haveC < 3) req.push({ appendDimension: { sheetId: sid, dimension: 'COLUMNS', length: 3 - haveC } });
+  req.push({ updateCells: { range: { sheetId: sid, startRowIndex: 0, endRowIndex: end, startColumnIndex: 0, endColumnIndex: 3 }, fields: 'userEnteredValue,userEnteredFormat', rows: rows.map((r) => ({ values: r })) } });
+  [150, 760, 60].forEach((w, i) => req.push({ updateDimensionProperties: { range: { sheetId: sid, dimension: 'COLUMNS', startIndex: i, endIndex: i + 1 }, properties: { pixelSize: w }, fields: 'pixelSize' } }));
+  req.push({ autoResizeDimensions: { dimensions: { sheetId: sid, dimension: 'ROWS', startIndex: 0, endIndex: rows.length } } });
+  return req;
+}
+
+// make sure the file has its tabs (creating what is missing) and learn their ids; `about` = { fys: the fiscal years this file serves,
+// backup: whether it is a BACKUP file }, given when the explanation tab should be written too
+async function gsPrepare(id, about) {
+  let meta = await gsMeta(id);
+  const find = (t) => meta.tabs.find((x) => x.title === t);
+  for (const t of GS_TABS) if (find(t)) { const head = await gsRead(id, gsA1(t, 'A1')); if (str((head[0] || [])[0]) !== GS_HEAD[t][0]) throw { code: 'wrong_tabs', tab: t }; }
+  const missing = GS_TABS.filter((t) => !find(t)), used = new Set(meta.tabs.map((x) => x.sheetId)), req = [];
+  const newId = (sid) => { while (used.has(sid)) sid += 10; used.add(sid); return sid; };
+  if (about && about.fys.length) {
+    const cur = find(GS_ABOUT), first = meta.tabs[0], files = {};
+    for (const k in sheets.files) files[k] = { id: sheets.files[k].id, name: sheets.files[k].name };
+    if (!about.backup) about.fys.forEach((k) => { files[k] = { id, name: meta.name }; });
+    let sid, grid;
+    if (cur) { sid = cur.sheetId; grid = cur.gridProperties; }
+    else if (missing.length === GS_TABS.length && meta.tabs.length === 1 && !(await gsRead(id, gsA1(first.title, 'A1:E20'))).length) {
+      // a blank new file: its empty first tab becomes the note that says what the file is
+      sid = first.sheetId; grid = first.gridProperties;
+      req.push({ updateSheetProperties: { properties: { sheetId: sid, title: GS_ABOUT }, fields: 'title' } });
+    } else {
+      sid = newId(60200); grid = { rowCount: 100, columnCount: 3 };
+      req.push({ addSheet: { properties: { sheetId: sid, title: GS_ABOUT, index: 0, gridProperties: grid } } });
+    }
+    gsAboutReq(sid, grid, about.fys, files, about.backup).forEach((q) => req.push(q));
+  }
+  for (const t of missing) {
+    const sid = newId(GS_ID0[t]);
+    req.push({ addSheet: { properties: { sheetId: sid, title: t, hidden: GS_HIDDEN.includes(t), gridProperties: { rowCount: 2, columnCount: GS_HEAD[t].length, frozenRowCount: 1 } } } });
+    req.push({ updateCells: { start: { sheetId: sid, rowIndex: 0, columnIndex: 0 }, fields: 'userEnteredValue,userEnteredFormat.textFormat.bold', rows: [{ values: GS_HEAD[t].map(gsHeadCell) }] } });
+    req.push({ addProtectedRange: { protectedRange: { range: { sheetId: sid }, description: GS_LOCK, warningOnly: true } } });
+  }
+  if (req.length) { await gs('update_spreadsheet', { spreadsheetId: id, requests: req }); meta = await gsMeta(id); }
+  const tabs = {};
+  for (const t of GS_TABS) { const x = find(t); if (!x || !Number.isInteger(x.sheetId)) throw { code: 'upstream_error' }; tabs[t] = x.sheetId; }
+  return { id, name: meta.name, tabs };
+}
+// look at a file again (repairing its tabs) and remember what was found for every fiscal year that uses it
+async function gsRelearn(id, about) {
+  const file = await gsPrepare(id, about);
+  for (const kind of GS_KINDS) for (const k in sheets[kind]) if (sheets[kind][k].id === id) sheets[kind][k] = clone(file);
+  await saveSheets();
+  return file;
+}
+// the stored snapshot of one save: from the file's ARCHIVE tab, or, when that row is damaged or gone, from the BACKUP file given as `alt`
+async function gsSnap(id, saveId, row, alt) {
+  for (const [fid, at] of [[id, row || 0], [alt || '', 0]]) {
+    if (!fid) continue;
+    try {
+      let n = at, r = n ? (await gsRead(fid, 'ARCHIVE!' + n + ':' + n))[0] || [] : null;
+      if (!r || str(r[0]) !== saveId) { n = (await gsColA(fid, 'ARCHIVE')).indexOf(saveId) + 1; r = n ? (await gsRead(fid, 'ARCHIVE!' + n + ':' + n))[0] || [] : null; }
+      if (r && str(r[0]) === saveId) { const e = JSON.parse(r.slice(7, 7 + Math.max(1, Math.round(+r[6]) || 1)).join('')); if (e && e.report) return e; }
+    } catch (x) { if (fid === id && x && x.code && x.code !== 'tool_error') throw x; }   // unreadable row, missing tab, or a BACKUP file this account cannot open
+  }
+  throw { code: 'broken' };
+}
+// remove every row of the given saves from a file (all its tabs in one request)
+async function gsDropRows(id, ids) {
+  const meta = await gsMeta(id), req = [];
+  for (const t of GS_TABS) {
+    const tab = meta.tabs.find((x) => x.title === t);
+    if (!tab) continue;
+    const col = await gsColA(id, t), hit = [];
+    col.forEach((v, i) => { if (i > 0 && ids.includes(v)) hit.push(i); });
+    if (!hit.length) continue;
+    if (hit.length >= col.length - 1) req.push({ appendDimension: { sheetId: tab.sheetId, dimension: 'ROWS', length: 1 } });   // a sheet must keep one row under its frozen heading
+    for (let j = hit.length - 1; j >= 0;) { let i = j; while (i > 0 && hit[i - 1] === hit[i] - 1) i--; req.push({ deleteDimension: { range: { sheetId: tab.sheetId, dimension: 'ROWS', startIndex: hit[i], endIndex: hit[j] + 1 } } }); j = i - 1; }
+  }
+  if (req.length) await gs('update_spreadsheet', { spreadsheetId: id, requests: req });
+}
+
+async function saveSheets() {
+  lsSet('sheets', sheets);
+  if (!store || !canWrite) return false;
+  try { await store.sheets.set(clone(sheets)); return true; } catch (e) { return false; }
+}
+// read what other devices stored, keeping anything this page still holds in its own queue
+async function pullSheets() {
+  if (!store) return;
+  try {
+    const g = await store.sheets.get();
+    if (!g.exists) return;
+    const fresh = normSheets(clone(g.data()));
+    for (const id in sheets.bgone) fresh.bgone[id] = 1;
+    sheets.pending.forEach((id) => { if (!fresh.pending.includes(id)) fresh.pending.push(id); });
+    sheets.bpending.forEach((id) => { if (!fresh.bpending.includes(id) && !fresh.bgone[id]) fresh.bpending.push(id); });
+    for (const id in sheets.parked) if (!(id in fresh.parked)) fresh.parked[id] = sheets.parked[id];
+    for (const k in sheets.carry) if (!(k in fresh.carry)) fresh.carry[k] = sheets.carry[k];
+    sheets = fresh;
+  } catch (e) { /* carry on with what this page has */ }
+}
+async function gsQueue(id) {
+  await pullSheets();
+  if (!sheets.pending.includes(id)) sheets.pending.push(id);
+  if (!sheets.bpending.includes(id)) sheets.bpending.push(id);
+  await saveSheets();
+  renderGs();
+}
+const gsForget = (seen, fid) => { delete seen[fid]; };
+// send one saved report to a main or a BACKUP file; the ids already in its ARCHIVE tab are read first, so a repeat is harmless
+// and an unclear earlier attempt never doubles a row
+async function gsSendOne(fid, e, seen, absent) {
+  const attempt = async () => {
+    const file = gsFile(fid);
+    if (!file || GS_TABS.some((t) => file.tabs[t] == null)) throw { code: 'tool_error', message: '' };
+    const ids = seen[fid] || (seen[fid] = await gsColA(fid, 'ARCHIVE'));
+    if (ids.includes(e.id)) return false;
+    if (absent) await absent();
+    await gs('update_spreadsheet', { spreadsheetId: fid, requests: gsAppendReq(file, gsRows(e)) });
+    ids.push(e.id);
+    return true;
+  };
+  try { return await attempt(); }
+  catch (x) {
+    if (!x || x.code !== 'tool_error' || !gsFile(fid)) throw x;   // a definite "no" from Google: look at the tabs again, repair, try once more
+    await gsRelearn(fid);
+    gsForget(seen, fid);
+    return attempt();
+  }
+}
+// every save of a fiscal year that its main file holds is written to that year's BACKUP file when it is not there yet.
+// Nothing is ever removed here, and what was deleted from the BACKUP on purpose stays out.
+async function gsBackupFill(fy, seen, b) {
+  const bf = sheets.backups[fy], home = gsHome(fy);
+  if (!bf || !home) return;
+  const have = seen[bf.id] || (seen[bf.id] = await gsColA(bf.id, 'ARCHIVE'));
+  for (const r of await gsRead(home.file.id, 'ARCHIVE!A2:B')) {
+    const id = str(r[0]);
+    if (!ID_RE.test(id) || fyOfISO(str(r[1])) !== fy || sheets.bgone[id] || have.includes(id)) continue;
+    await lease(store.gslock, 120000);
+    if (await gsSendOne(bf.id, Object.assign({}, await gsSnap(home.file.id, id), { id }), seen)) b.sent++;
+  }
+}
+// once a fiscal year has its own main file, its saves that waited in an earlier year's file are written there and then removed from the old file
+async function gsMoveParked(seen, out, scanFy) {
+  const jobs = {};
+  const want = (old, id, fy) => { if (sheets.files[fy] && sheets.files[fy].id !== old) (jobs[old] = jobs[old] || {})[id] = fy; };
+  let dirty = false;
+  for (const id of Object.keys(sheets.parked)) {
+    const fy = fyOfISO(id.slice(1, 11)), f = sheets.files[fy];
+    if (f && f.id === sheets.parked[id]) { delete sheets.parked[id]; dirty = true; } else want(sheets.parked[id], id, fy);
+  }
+  if (scanFy && sheets.files[scanFy]) {
+    // the file of this year was just set: look through the earlier file for rows that belong to this year
+    let prev = null;
+    for (let d = 1; d <= 5 && !prev; d++) { const k = fyPrev(scanFy, d); if (sheets.files[k] && sheets.files[k].id !== sheets.files[scanFy].id) prev = sheets.files[k]; }
+    if (prev) (await gsRead(prev.id, 'ARCHIVE!A2:B')).forEach((r) => { if (ID_RE.test(str(r[0])) && fyOfISO(str(r[1])) === scanFy) want(prev.id, str(r[0]), scanFy); });
+  }
+  for (const old of Object.keys(jobs)) {
+    const ids = Object.keys(jobs[old]).sort(), there = {};
+    for (const id of ids) {
+      const to = sheets.files[jobs[old][id]];
+      if (!(seen[to.id] || (seen[to.id] = await gsColA(to.id, 'ARCHIVE'))).includes(id)) await gsSendOne(to.id, Object.assign({}, await gsSnap(old, id), { id }), seen);
+      there[to.id] = 1;
+    }
+    // only what a fresh reading finds in the new file leaves the old one
+    const now = {}; for (const fid in there) now[fid] = await gsColA(fid, 'ARCHIVE');
+    const gone = ids.filter((id) => now[sheets.files[jobs[old][id]].id].includes(id));
+    if (gone.length) { await gsDropRows(old, gone); gsForget(seen, old); out.moved = (out.moved || 0) + gone.length; }
+    gone.forEach((id) => { delete sheets.parked[id]; }); dirty = true;
+  }
+  if (dirty) await saveSheets();
+}
+// send everything not yet in the Google Sheets: the queues, plus the latest saves in the page store in case one was
+// saved from a page that could not queue it (an older copy of this page left open, a failed queue write).
+// opts.scan = a fiscal year whose main file was just set; opts.fill = fiscal years whose BACKUP file was just set;
+// opts.check = also make sure the BACKUP of the current fiscal year holds everything its main file holds
+async function gsFlush(opts) {
+  opts = (opts && typeof opts === 'object' && !('type' in opts)) ? opts : {};
+  if (!store) return null;
+  if (gsBusy) { gsAgain = Object.assign(gsAgain || {}, opts); return gsLast; }
+  gsBusy = true; renderGs();
+  const out = { s: 'ok', sent: 0, file: null, nofile: '', parked: '', at: '', moved: 0, copied: 0, lost: '', b: { s: 'none', sent: 0, nofile: '' } };
+  const lk = await lease(store.gslock, 120000);
+  if (lk === false) out.s = 'wait';                              // another device is writing to the Google Sheet right now
+  else {
+    const ents = {}, seen = {};
+    // one saved report from the page store, or null when it is not there
+    const load = async (id) => {
+      if (id in ents) return ents[id];
+      let snap;
+      try { snap = await store.hist(id).get(); } catch (x) { throw { code: 'store' }; }
+      return (ents[id] = snap.exists ? Object.assign({}, snap.data(), { id }) : null);
+    };
+    let ids = [];
+    try {
+      await pullSheets();
+      const set = {};
+      sheets.pending.concat(sheets.bpending).forEach((id) => { set[id] = 1; });
+      // only saves the page store has confirmed (counted in app/state) are sent
+      try {
+        const st = await store.state.get(), revs = (st.exists && st.data().revs) || {};
+        (await store.histRecent()).docs.forEach((d) => { const m = /^r(\d{4}-\d{2}-\d{2})_(\d+)$/.exec(d.id); if (m && +m[2] <= (Math.round(+revs[m[1]]) || 0)) { ents[d.id] = Object.assign({}, d.data(), { id: d.id }); set[d.id] = 1; } });
+      } catch (x) { /* the queues alone still work */ }
+      ids = Object.keys(set).sort();
+      for (const id of ids) {
+        const drop = async () => { if (sheets.pending.includes(id)) { sheets.pending = sheets.pending.filter((x) => x !== id); await saveSheets(); } };
+        const e = await load(id);
+        if (!e || !e.report) { await drop(); continue; }
+        const fy = fyOfISO(str(e.reportDate) || e.report.dateFrom), home = gsHome(fy);
+        if (!home) {
+          out.nofile = out.nofile || fy || '?';
+          if (!sheets.pending.includes(id)) { sheets.pending.push(id); await saveSheets(); }
+          continue;
+        }
+        // a save found in the page store but not in the file joins the queue before it is written, so a failed write leaves it waiting
+        const absent = async () => { if (!sheets.pending.includes(id)) { sheets.pending.push(id); await saveSheets(); renderGs(); } };
+        if (home.parked && sheets.parked[id] !== home.file.id) { sheets.parked[id] = home.file.id; await saveSheets(); }   // noted before it is written
+        if (home.parked) { out.parked = fy; out.at = home.at; }
+        await lease(store.gslock, 120000);
+        if (await gsSendOne(home.file.id, e, seen, absent)) { out.sent++; out.file = home.file; }
+        else if (!out.file) out.file = home.file;
+        await drop();
+      }
+      // a fiscal year whose main file was replaced by another one: what the old file holds of that year is copied to the new file.
+      // The old file is left exactly as it is.
+      for (const k of Object.keys(sheets.carry)) {
+        const to = sheets.files[k], old = sheets.carry[k];
+        if (to && to.id !== old) {
+          let rows = [];
+          try { rows = await gsRead(old, 'ARCHIVE!A2:B'); } catch (x) { if (!x || x.code !== 'tool_error') throw x; out.lost = k; }   // the old file is gone, or closed to this account
+          for (const r of rows) {
+            const id = str(r[0]);
+            if (!ID_RE.test(id) || fyOfISO(str(r[1])) !== k || (seen[to.id] || (seen[to.id] = await gsColA(to.id, 'ARCHIVE'))).includes(id)) continue;
+            let e;
+            try { e = await gsSnap(old, id); } catch (x) { if (x && x.code === 'broken') continue; throw x; }
+            await lease(store.gslock, 120000);
+            if (await gsSendOne(to.id, Object.assign({}, e, { id }), seen)) out.copied++;
+          }
+        }
+        delete sheets.carry[k]; await saveSheets();
+      }
+      if (Object.keys(sheets.parked).length || opts.scan) await gsMoveParked(seen, out, opts.scan);
+    } catch (x) { out.s = 'err'; out.code = (x && x.code) || 'upstream_error'; out.message = x && x.message; out.tab = x && x.tab; }
+    // the BACKUP files come second and on their own: whatever happens here leaves the result for the main file as it is.
+    // An account that cannot open the BACKUP file (anyone but its owner) leaves the saves waiting for the owner.
+    const b = out.b;
+    try {
+      for (const id of ids) {
+        const dropB = async () => { if (sheets.bpending.includes(id)) { sheets.bpending = sheets.bpending.filter((x) => x !== id); await saveSheets(); } };
+        if (sheets.bgone[id]) { await dropB(); continue; }
+        const e = await load(id);
+        if (!e || !e.report) { await dropB(); continue; }
+        const fy = fyOfISO(str(e.reportDate) || e.report.dateFrom), bf = sheets.backups[fy];
+        if (!bf) { b.nofile = fy || '?'; continue; }                 // the ids run oldest first, so the latest year without a BACKUP file is the one named
+        if (b.s === 'none') b.s = 'ok';
+        const absent = async () => { if (!sheets.bpending.includes(id)) { sheets.bpending.push(id); await saveSheets(); renderGs(); } };
+        await lease(store.gslock, 120000);
+        if (await gsSendOne(bf.id, e, seen, absent)) b.sent++;
+        await dropB();
+      }
+      const fill = [].concat(opts.fill || [], opts.check ? [fyOfISO(todayTH())] : []).filter((k, i, a) => k && a.indexOf(k) === i && sheets.backups[k]);
+      for (const fy of fill) { if (b.s === 'none') b.s = 'ok'; await gsBackupFill(fy, seen, b); }
+    } catch (x) { b.s = (x && x.code === 'tool_error') ? 'noaccess' : 'err'; b.code = (x && x.code) || 'upstream_error'; }
+  }
+  if (lk) unlease(store.gslock);
+  gsBusy = false; gsLast = out;
+  renderGs();
+  if (out.s === 'wait' && gsWait < 3) { gsWait++; setTimeout(() => gsFlush(opts), 6000); return out; }
+  gsWait = 0;
+  if (gsAgain) { const o = gsAgain; gsAgain = null; return gsFlush(o); }
+  return out;
+}
+function gsErrText(x) {
+  const c = (x && x.code) || 'upstream_error';
+  if (c === 'server_not_connected' || c === 'server_not_found') return 'บัญชี Claude นี้ยังไม่ได้เชื่อม Google Sheets ให้เพิ่มที่ Settings → Connectors แล้วลองอีกครั้ง';
+  if (c === 'needs_reauth') return 'การเชื่อม Google Sheets หมดอายุ ให้เชื่อมใหม่ที่ Settings → Connectors แล้วลองอีกครั้ง';
+  if (c === 'selection_required') return 'บัญชีนี้มีตัวเชื่อม Google Sheets มากกว่าหนึ่งตัว เลือกตัวที่จะใช้ในหน้าต่างที่ Claude ถาม แล้วลองอีกครั้ง';
+  if (c === 'not_in_manifest' || c === 'consent_required') return 'หน้านี้ยังไม่ได้รับอนุญาตให้ใช้ Google Sheets ของคุณ กดอนุญาตเมื่อ Claude ถาม แล้วลองอีกครั้ง';
+  if (c === 'blocked_by_policy' || c === 'approval_required') return 'องค์กรของคุณไม่อนุญาตให้หน้านี้ใช้ Google Sheets ให้ติดต่อผู้ดูแลบัญชี';
+  if (c === 'not_granted' || c === 'capability_disabled' || c === 'capability_removed' || c === 'user_changed') return 'มุมมองนี้ใช้ Google Sheets ไม่ได้ เปิดหน้านี้ในแอป Claude แล้วลองอีกครั้ง';
+  if (c === 'tool_error') return 'Google Sheets ทำรายการไม่ได้ ตรวจว่าบัญชีนี้มีสิทธิ์แก้ไขไฟล์ และแท็บ ARCHIVE DATA SUMMARY ยังอยู่ครบ' + (x.message ? ' (' + str(x.message).slice(0, 160) + ')' : '');
+  if (c === 'wrong_tabs') return 'ไฟล์นี้มีแท็บชื่อ ' + str(x.tab) + ' อยู่แล้ว แต่ไม่ใช่รูปแบบของหน้านี้ ให้ใช้ Google Sheet เปล่า';
+  if (c === 'too_large') return 'รายงานนี้ใหญ่เกินกว่าจะเก็บในหนึ่งแถวของ Google Sheet';
+  if (c === 'broken') return 'ข้อมูลของรายงานนี้ในแท็บ ARCHIVE ถูกแก้ไขจนอ่านไม่ได้ และอ่านจากไฟล์ BACKUP แทนไม่ได้';
+  if (c === 'noaccess') return 'บัญชี Google นี้เปิดไฟล์ BACKUP ไม่ได้ ไฟล์นี้เปิดได้เฉพาะเจ้าของไฟล์';
+  if (c === 'store') return 'อ่านข้อมูลจากระบบเก็บข้อมูลของหน้าเว็บไม่ได้ ลองอีกครั้ง';
+  return 'ติดต่อ Google Sheets ไม่ได้ชั่วคราว ลองอีกครั้ง การส่งซ้ำจะตรวจก่อนว่าข้อมูลขึ้นไปแล้วหรือยัง จึงไม่เกิดแถวซ้ำ';
+}
+const GS_WAIT = 'อีกเครื่องหนึ่งกำลังส่งขึ้น Google Sheet อยู่ รายการนี้เข้าคิวรอและจะลองส่งอีกครั้งเอง';
+const parkedText = (o) => 'ยังไม่ได้วางลิงก์ไฟล์ Google Sheet ของปีงบประมาณ ' + o.parked + ' · บันทึกลงไฟล์ปีงบประมาณ ' + o.at + ' ไว้ก่อน เมื่อวางลิงก์แล้วจะย้ายไปไฟล์ใหม่และลบออกจากไฟล์เดิมให้';
+// what happened with the BACKUP file in the last send; long = the wording for the saved page
+function gsBackupText(b) {
+  if (!b) return '';
+  if (b.s === 'noaccess') return 'บัญชี Google นี้เปิดไฟล์ BACKUP ไม่ได้ (เปิดได้เฉพาะเจ้าของไฟล์) รายการจะรอ และถูกสำรองเมื่อเจ้าของไฟล์เปิดหน้านี้';
+  if (b.s === 'err') return 'สำรองลงไฟล์ BACKUP ไม่สำเร็จ รายการรออยู่ และจะลองอีกครั้งในการส่งครั้งถัดไป';
+  if (b.nofile) return 'ยังไม่ได้วางลิงก์ไฟล์ BACKUP ของปีงบประมาณ ' + b.nofile + ' รายการจะรอสำรองจนกว่าจะวางลิงก์';
+  if (b.s === 'none') return '';
+  return b.sent ? 'สำรองลงไฟล์ BACKUP แล้ว ' + b.sent + ' รายการ' : 'ไฟล์ BACKUP ครบแล้ว';
+}
+function gsOutText(o) {
+  if (!o) return '';
+  if (o.s === 'err') return gsErrText(o);
+  if (o.s === 'wait') return GS_WAIT;
+  const bt = gsBackupText(o.b), extra = (o.moved ? ' · ย้ายรายการของปีงบประมาณใหม่ไปไฟล์ใหม่แล้ว ' + o.moved + ' รายการ' : '') + (o.copied ? ' · คัดลอกรายการจากไฟล์เดิมมาไฟล์ใหม่แล้ว ' + o.copied + ' รายการ' : '')
+    + (o.lost ? ' · เปิดไฟล์เดิมของปีงบประมาณ ' + o.lost + ' ไม่ได้ จึงไม่ได้คัดลอกรายการจากไฟล์นั้น' : '') + (bt ? ' · ' + bt : '');
+  if (o.nofile) return 'ยังไม่ได้ตั้งไฟล์ Google Sheet ของปีงบประมาณ ' + o.nofile + (o.sent ? ' · รายการอื่นส่งแล้ว ' + o.sent + ' รายการ' : '') + extra;
+  return (o.sent ? 'ส่งขึ้น Google Sheet แล้ว ' + o.sent + ' รายการ' : 'ทุกรายการอยู่ใน Google Sheet แล้ว') + extra + (o.parked ? ' · ' + parkedText(o) : '');
+}
+// what the current fiscal year still lacks: its main file (m), its BACKUP file (b)
+function fyNeeds() {
+  const fy = fyOfISO(todayTH());
+  if (!store || !Object.keys(sheets.files).length) return null;
+  const m = !sheets.files[fy], b = !sheets.backups[fy];
+  return (m || b) ? { fy, m, b } : null;
+}
+function fyNeedsText(q, long) {
+  const h = gsHome(q.fy);
+  if (!q.m) return 'ยังไม่ได้วางลิงก์ไฟล์ BACKUP ของปีงบประมาณ ' + q.fy + ' (' + fySpan(q.fy) + ') · SAVE ได้ตามปกติ รายการจะรอสำรองจนกว่าจะวางลิงก์';
+  return 'ขึ้นปีงบประมาณ ' + q.fy + ' แล้ว (' + fySpan(q.fy) + ') ยังไม่ได้วางลิงก์ไฟล์ Google Sheet' + (q.b ? ' และไฟล์ BACKUP' : '') + ' ของปีนี้ · SAVE ได้ตามปกติ'
+    + (h ? ' ระหว่างนี้บันทึกลงไฟล์ปีงบประมาณ ' + h.at + ' ไว้ก่อน' + (long ? ' เมื่อวางลิงก์แล้ว รายการของปีงบประมาณ ' + q.fy + ' จะถูกย้ายไปไฟล์ใหม่ และลบออกจากไฟล์เดิมให้เอง' : '') : '');
+}
+function renderGs() {
+  const chip = $('gs-chip'), line = $('gs-line'), note = $('fy-note');
+  if (!store) { chip.hidden = true; line.hidden = true; note.hidden = true; return; }
+  const n = sheets.pending.length, nb = sheets.bpending.length, fy = fyOfISO(todayTH()), q = fyNeeds();
+  chip.hidden = false;
+  chip.dataset.s = gsBusy ? 'busy' : (n || nb || !sheets.files[fy]) ? 'warn' : 'ok';
+  chip.textContent = 'Google Sheet: ' + (gsBusy ? 'กำลังส่ง…' : (n ? 'ค้างส่ง ' + n + ' รายการ' : !sheets.files[fy] ? 'ยังไม่ได้วางลิงก์ไฟล์ปีงบประมาณ ' + fy : 'ส่งครบแล้ว') + (nb ? ' · รอสำรอง BACKUP ' + nb + ' รายการ' : ''));
+  note.hidden = !q;
+  if (q) note.innerHTML = '<span>' + esc(fyNeedsText(q, false)) + '</span><button type="button" class="btn small" data-act="gs">' + (q.m ? 'วางลิงก์ไฟล์ใหม่' : 'วางลิงก์ไฟล์ BACKUP') + '</button>';
+  const o = gsLast;
+  if (!o) { line.hidden = true; return; }
+  const kept = ' · รายงานนี้เก็บอยู่ในหน้าเว็บแล้ว แต่ยังไม่ขึ้น Google Sheet';
+  let s = 'busy', h = 'กำลังส่งขึ้น Google Sheet…';
+  if (!gsBusy && o.s === 'err') { s = 'warn'; h = '<span>' + esc(gsErrText(o) + kept) + '</span><button type="button" class="btn small" data-act="gsretry">ส่งอีกครั้ง</button>'; }
+  else if (!gsBusy && o.s === 'wait') { s = 'warn'; h = '<span>' + esc(GS_WAIT) + '</span><button type="button" class="btn small" data-act="gsretry">ส่งอีกครั้ง</button>'; }
+  else if (!gsBusy && o.s === 'ok') {
+    const b = o.b || {}, bt = gsBackupText(b), bwarn = b.s === 'err' || b.s === 'noaccess' || !!b.nofile;
+    if (o.nofile) { s = 'warn'; h = '<span>' + esc('ยังไม่ได้ตั้งไฟล์ Google Sheet ของปีงบประมาณ ' + o.nofile + kept + ' จะส่งขึ้นเมื่อตั้งไฟล์') + '</span><button type="button" class="btn small" data-act="gs">ตั้งค่า Google Sheet</button>'; }
+    else {
+      s = (o.parked || bwarn) ? 'warn' : 'ok';
+      h = '<span>ส่งขึ้น Google Sheet แล้ว</span>' + (o.file ? '<a href="' + esc(gsUrl(o.file.id)) + '" target="_blank" rel="noopener">เปิดไฟล์ ' + esc(o.file.name || 'Google Sheet') + '</a>' : '')
+        + (o.parked ? '<span>' + esc(parkedText(o)) + '</span><button type="button" class="btn small" data-act="gs">วางลิงก์ไฟล์ใหม่</button>' : '');
+    }
+    if (bt) h += '<span>' + esc(b.s === 'ok' && !b.nofile ? 'สำรองลงไฟล์ BACKUP แล้ว' : bt) + '</span>'
+      + (b.nofile && !o.parked && !o.nofile ? '<button type="button" class="btn small" data-act="gs">วางลิงก์ไฟล์ BACKUP</button>' : b.s === 'err' ? '<button type="button" class="btn small" data-act="gsretry">ส่งอีกครั้ง</button>' : '');
+  }
+  line.hidden = false; line.dataset.s = s; line.innerHTML = h;
+}
+// the current fiscal year without its main file or its BACKUP file: say so once a day until the links are placed
+function fyRemind() {
+  const q = fyNeeds(), today = todayTH();
+  if (!q || !canWrite || dlg.open || lsGet('fyAsk') === today || fyAsked === today) return;
+  fyAsked = today; lsSet('fyAsk', today);
+  ask({ title: q.m ? 'ขึ้นปีงบประมาณ ' + q.fy + ' แล้ว' : 'ยังไม่มีไฟล์ BACKUP ของปีงบประมาณ ' + q.fy, message: fyNeedsText(q, true) + '\n\nหน้านี้จะเตือนทุกวันจนกว่าจะวางลิงก์', ok: 'วางลิงก์ตอนนี้', cancel: 'ไว้ทีหลัง' })
+    .then((r) => { if (r) gsSettings(); });
+}
+let fyAsked = '';
+const gsIdOf = (v) => { v = str(v).trim(); const m = /\/d\/([A-Za-z0-9_-]{20,})/.exec(v) || /^([A-Za-z0-9_-]{25,})$/.exec(v); return m ? m[1] : ''; };
+async function gsSettings() {
+  await settled();
+  if (!store) { toast('มุมมองนี้ยังไม่ได้เชื่อมกับระบบเก็บข้อมูล จึงใช้ Google Sheet ไม่ได้'); return; }
+  await pullSheets(); renderGs();
+  const n = sheets.pending.length, nb = sheets.bpending.length, years = Object.keys(Object.assign({}, sheets.files, sheets.backups)).sort((a, b) => ((+a + 50) % 100) - ((+b + 50) % 100));
+  const nameOf = (f) => (f ? (f.name || f.id) : 'ยังไม่ได้วางลิงก์');
+  const list = years.map((fy) => 'ปีงบประมาณ ' + fy + ': ไฟล์หลัก ' + nameOf(sheets.files[fy]) + ' · ไฟล์ BACKUP ' + nameOf(sheets.backups[fy]));
+  if (!list.length) list.push('ยังไม่ได้ตั้งไฟล์ของปีงบประมาณใด');
+  list.push((n ? 'ค้างส่งไฟล์หลัก ' + n + ' รายการ' : 'ไฟล์หลักไม่มีรายการค้างส่ง') + ' · ' + (nb ? 'รอสำรอง BACKUP ' + nb + ' รายการ' : 'ไม่มีรายการรอสำรอง'));
+  const BAD = 'วางลิงก์ของ Google Sheet ให้ครบ (ขึ้นต้นด้วย https://docs.google.com/spreadsheets/d/…)', SAME = 'ไฟล์ BACKUP ต้องเป็นคนละไฟล์กับไฟล์หลักของทุกปีงบประมาณ';
+  const used = (kind, id) => Object.keys(sheets[kind]).some((k) => sheets[kind][k].id === id);
+  const r = await ask({
+    title: 'Google Sheet สำหรับเก็บข้อมูลระยะยาว',
+    message: 'ทุกครั้งที่ SAVE รายงานจะถูกเขียนต่อท้ายลงไฟล์หลักของปีงบประมาณนั้น (1 ต.ค. – 30 ก.ย.) ตามวันที่เริ่มต้นของรายงาน และเขียนชุดเดียวกันลงไฟล์ BACKUP ของปีนั้น\n\nแต่ละปีงบประมาณใช้ Google Sheet เปล่าสองไฟล์: ไฟล์หลัก และไฟล์ BACKUP ที่ไม่แชร์ให้ผู้อื่น วางลิงก์ด้านล่าง (วางทีละไฟล์ก็ได้) หน้าเว็บจะสร้างแท็บให้เอง',
+    list, ok: 'ตั้งไฟล์', cancel: 'ปิด',
+    actions: Object.keys(sheets.files).length ? [{ label: 'ตรวจและส่งรายการที่ยังไม่ขึ้น Google Sheet', busy: 'กำลังตรวจและส่งขึ้น Google Sheet…', fail: 'ส่งไม่สำเร็จ ลองอีกครั้ง', run: async () => gsOutText(await gsFlush({ check: true })) }] : null,
+    fields: [{ id: 'fy', label: 'ปีงบประมาณ (พ.ศ. สองหลัก)', value: (fyNeeds() || {}).fy || fiscalYear(work), attrs: ' inputmode="numeric" maxlength="2"' }, { id: 'link', label: 'ลิงก์ไฟล์หลักของปีงบประมาณนี้' }, { id: 'blink', label: 'ลิงก์ไฟล์ BACKUP ของปีงบประมาณนี้' }, PASS_FIELD],
+    check: (v) => {
+      const a = gsIdOf(v.link), b = gsIdOf(v.blink);
+      if (!/^\d{2}$/.test(arabic(v.fy).trim())) return 'ปีงบประมาณต้องเป็นเลขสองหลัก เช่น 70';
+      if (!v.link.trim() && !v.blink.trim()) return 'วางลิงก์อย่างน้อยหนึ่งช่อง';
+      if ((v.link.trim() && !a) || (v.blink.trim() && !b)) return BAD;
+      if ((a && a === b) || (b && used('files', b)) || (a && used('backups', a))) return SAME;
+      return passOk('sheet', v.pw) ? '' : 'รหัสผ่านไม่ถูกต้อง';
+    },
+  });
+  if (!r) return;
+  const fy = arabic(r.fy).trim(), id = gsIdOf(r.link), bid = gsIdOf(r.blink);
+  toast('กำลังตรวจไฟล์และสร้างแท็บ…');
+  try {
+    await pullSheets();
+    const done = [];
+    let unsaved = false;
+    if (id) {
+      const file = await gsPrepare(id, { fys: fysOf(id).filter((k) => k !== fy).concat([fy]).sort(), backup: false });
+      await pullSheets();
+      const before = sheets.files[fy] && sheets.files[fy].id !== id ? sheets.files[fy].id : '';
+      sheets.files[fy] = file;
+      if (before) sheets.carry[fy] = before;                 // the year's saves in the file it had until now follow it into this one
+      for (const k in sheets.files) if (sheets.files[k].id === id) sheets.files[k] = clone(file);
+      unsaved = !(await saveSheets()) || unsaved;
+      done.push('ไฟล์หลัก ' + (file.name || id));
+      // the main files of the years next to this one list every year's file on their first tab: bring them up to date (not essential, so a failure is let go)
+      const near = [fyPrev(fy), pad2((+fy + 1) % 100)].map((k) => (sheets.files[k] ? sheets.files[k].id : '')).filter((x, i, a) => x && x !== id && a.indexOf(x) === i);
+      for (const x of near) { try { await gsRelearn(x, { fys: fysOf(x), backup: false }); } catch (z) { /* its list of links stays as it was */ } }
+    }
+    if (bid) {
+      const file = await gsPrepare(bid, { fys: fysOf(bid, 'backups').filter((k) => k !== fy).concat([fy]).sort(), backup: true });
+      await pullSheets();
+      sheets.backups[fy] = file;
+      for (const k in sheets.backups) if (sheets.backups[k].id === bid) sheets.backups[k] = clone(file);
+      unsaved = !(await saveSheets()) || unsaved;
+      done.push('ไฟล์ BACKUP ' + (file.name || bid));
+    }
+    renderGs();
+    toast('ตั้งไฟล์ของปีงบประมาณ ' + fy + ' แล้ว: ' + done.join(' · ') + (unsaved ? ' (เก็บการตั้งค่าเข้าระบบไม่สำเร็จ จำไว้ในเบราว์เซอร์นี้)' : ''));
+    const o = await gsFlush({ scan: id ? fy : '', fill: bid ? [fy] : [], check: true }); if (o && (o.sent || o.moved || o.copied || o.lost || o.s !== 'ok' || o.nofile || (o.b && (o.b.sent || o.b.s === 'err' || o.b.s === 'noaccess')))) toast(gsOutText(o));
+  } catch (x) { await ask({ title: 'ตั้งไฟล์ไม่สำเร็จ', message: gsErrText(x), ok: 'ตกลง', noCancel: true }); }
+}
+
+/* ====================== look-back page ====================== */
+const hv = { rows: [], cur: null, token: 0 };
+// a saved report is listed under the name its PDF carries: the time it was saved, not the time it is opened again
+const histName = (x) => { const t = new Date(x.savedAt); return 'รายงานสถานภาพ บ. 602 ' + stampOf(isNaN(t) ? new Date() : t).file + (x.rev ? ' REV.' + x.rev : ''); };
+function histSources() {
+  const group = (kind) => {
+    const byId = {}, out = [];
+    for (const fy of Object.keys(sheets[kind]).sort().reverse()) { const f = sheets[kind][fy]; if (!byId[f.id]) out.push(byId[f.id] = { id: f.id, name: f.name, fys: [] }); byId[f.id].fys.unshift(fy); }
+    return out;
+  };
+  return group('files').map((f) => ({ v: 'gs:' + f.id, label: 'Google Sheet · ปีงบประมาณ ' + f.fys.join(', ') + (f.name ? ' · ' + f.name : '') }))
+    .concat(group('backups').map((f) => ({ v: 'bk:' + f.id, label: 'ไฟล์ BACKUP · ปีงบประมาณ ' + f.fys.join(', ') + (f.name ? ' · ' + f.name : '') + ' (เฉพาะเจ้าของไฟล์)' })))
+    .concat([{ v: 'page', label: 'สำเนาในหน้าเว็บ (1,000 ครั้งล่าสุด)' }]);
+}
+async function openHist() {
+  await settled();
+  await pullSheets();
+  const sel = $('h-src'), src = histSources(), f = sheets.files[fiscalYear(work)] || sheets.files[fyOfISO(todayTH())], want = f ? 'gs:' + f.id : '';
+  sel.innerHTML = src.map((o) => '<option value="' + esc(o.v) + '">' + esc(o.label) + '</option>').join('');
+  sel.value = src.some((o) => o.v === want) ? want : src[0].v;
+  showPanel('hist');
+  histLoad();
+}
+function histClose() { hv.cur = null; $('h-view').hidden = true; $('h-paper').hidden = true; $('h-del').hidden = true; }
+const HIST_FOUND = (n) => 'พบ ' + n + ' ไฟล์ · กดชื่อไฟล์เพื่อเปิดดู';
+async function histLoad() {
+  const src = $('h-src').value, info = $('h-info'), token = ++hv.token;
+  hv.rows = []; histClose(); $('h-month').innerHTML = ''; $('h-list').innerHTML = '';
+  info.textContent = 'กำลังโหลดรายการ…';
+  try {
+    let rows;
+    if (src === 'page') {
+      let entries;
+      if (store) { let snap; try { snap = await store.histAll(); } catch (x) { throw { code: 'store' }; } entries = snap.docs.map((d) => Object.assign({ id: d.id }, d.data())); }
+      else entries = lsGet('hist') || [];
+      rows = entries.filter((e) => e && e.report).map((e) => ({ id: str(e.id), date: str(e.reportDate || e.report.dateFrom), dateTo: str(e.report.dateTo), rev: Math.max(0, Math.round(+e.rev) || 0), savedAt: str(e.savedAt), entry: e }));
+    } else {
+      const file = src.slice(3), bk = src.slice(0, 3) === 'bk:';
+      try { rows = (await gsRead(file, 'ARCHIVE!A2:G')).map((r, i) => ({ id: str(r[0]), date: str(r[1]), dateTo: str(r[2]), rev: Math.max(0, Math.round(+r[3]) || 0), savedAt: str(r[5]), row: i + 2, file, bk })); }
+      catch (x) { throw (bk && x && x.code === 'tool_error') ? { code: 'noaccess' } : x; }
+    }
+    if (token !== hv.token) return;
+    rows = rows.filter((x) => parseISO(x.date));
+    rows.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.rev - a.rev));
+    hv.rows = rows;
+    const months = []; rows.forEach((x) => { const m = x.date.slice(0, 7); if (!months.includes(m)) months.push(m); });
+    $('h-month').innerHTML = '<option value="">ทั้งหมด</option>' + months.map((m) => '<option value="' + m + '">' + esc(MON[+m.slice(5) - 1] + pad2((+m.slice(0, 4) + 543) % 100)) + '</option>').join('');
+    histList();
+    info.textContent = rows.length ? HIST_FOUND(rows.length) : 'ยังไม่มีรายงานในแหล่งข้อมูลนี้';
+  } catch (x) { if (token === hv.token) info.textContent = gsErrText(x); }
+}
+function histList() {
+  const m = $('h-month').value;
+  $('h-list').innerHTML = hv.rows.map((x, i) => ((m && x.date.slice(0, 7) !== m) ? '' : '<button type="button" class="hrow" data-act="hview" data-i="' + i + '"' + (hv.cur && hv.cur.row === x ? ' aria-current="true"' : '') + '><b>' + esc(histName(x) + '.pdf')
+    + '</b><span>' + esc('รายงานวันที่ ' + fmtRange(x.date, parseISO(x.dateTo) ? x.dateTo : x.date) + (x.rev ? ' · แก้ไขครั้งที่ ' + x.rev : '')) + '</span></button>')).join('');
+}
+async function histView(i) {
+  const x = hv.rows[i], info = $('h-info'), token = hv.token;
+  if (!x) return;
+  info.textContent = 'กำลังเปิดไฟล์…';
+  try {
+    // a damaged row of a main file is read from that year's BACKUP file instead, when this account can open it
+    const alt = (!x.entry && !x.bk && sheets.backups[fyOfISO(x.date)]) ? sheets.backups[fyOfISO(x.date)].id : '';
+    const e = x.entry || await gsSnap(x.file, x.id, x.row, alt);
+    if (token !== hv.token) return;
+    const cfg = cfgOf(e), report = withCfg(cfg, () => normReport(e.report));
+    hv.cur = { row: x, cfg, report, savedAt: x.savedAt, rev: x.rev };
+    $('h-title').textContent = histName(x) + '.pdf';
+    $('h-sub').textContent = title1(report, x.rev) + (whenText(x.savedAt) ? ' · บันทึกเมื่อ ' + whenText(x.savedAt) : '') + ' · หน้ากระดาษด้านล่างคือหน้าเดียวกับไฟล์ PDF';
+    $('h-vinfo').textContent = '';
+    $('h-view').hidden = false; $('h-paper').hidden = false; $('h-del').hidden = !x.bk;
+    const draw = () => { const c = hv.cur; if (c) withCfg(c.cfg, () => drawPage($('paper3'), buildModel(c.report, c.rev))); };
+    draw(); fontsReady().then(() => { if (!$('panel-hist').hidden) draw(); });
+    histList();
+    info.textContent = HIST_FOUND(hv.rows.length);
+    $('h-view').scrollIntoView({ block: 'start' });
+    $('h-title').focus({ preventScroll: true });
+  } catch (z) { if (token === hv.token) info.textContent = gsErrText(z); }
+}
+const histFile = (ext) => histName(hv.cur) + '.' + ext;
+// the only way a row leaves a BACKUP file: asked for here, with the administrator's password
+async function histDelete() {
+  const c = hv.cur, x = c && c.row, info = $('h-vinfo');
+  if (!x || !x.bk || !store) return;
+  if (!await askPass('sheet', histName(x) + ' (รายงานวันที่ ' + fmtRange(x.date, parseISO(x.dateTo) ? x.dateTo : x.date) + ') จะถูกลบออกจากไฟล์ BACKUP ทั้งแท็บ ARCHIVE DATA และ SUMMARY และจะไม่ถูกสำรองซ้ำอีก\n\nไฟล์หลักและสำเนาในหน้าเว็บไม่ถูกแตะ การลบนี้ย้อนกลับไม่ได้', 'ลบออกจากไฟล์ BACKUP')) return;
+  info.textContent = 'กำลังลบออกจากไฟล์ BACKUP…';
+  const lk = await lease(store.gslock, 120000);
+  if (lk === false) { info.textContent = 'อีกเครื่องหนึ่งกำลังส่งขึ้น Google Sheet อยู่ รอสักครู่แล้วลองอีกครั้ง'; return; }
+  try {
+    await pullSheets();
+    sheets.bgone[x.id] = 1; sheets.bpending = sheets.bpending.filter((v) => v !== x.id);      // noted first, so no device backs it up again in between
+    if (!await saveSheets()) throw { code: 'store' };
+    await gsDropRows(x.file, [x.id]);
+  } catch (z) { if (lk) unlease(store.gslock); info.textContent = (z && z.code === 'tool_error') ? gsErrText({ code: 'noaccess' }) : gsErrText(z); return; }
+  if (lk) unlease(store.gslock);
+  renderGs();
+  toast('ลบออกจากไฟล์ BACKUP แล้ว');
+  histLoad();
+}
+async function histPdf() {
+  const c = hv.cur; if (!c) return '';
+  await fontsReady();
+  const made = withCfg(c.cfg, () => paperCanvas(buildModel(c.report, c.rev)));
+  if (!made) throw new Error('no canvas');
+  const msg = await handOver(histFile('pdf'), await buildPdf(made.canvas, title1(c.report, c.rev)));
+  return made.dpi === 600 ? msg : msg + ' (อุปกรณ์นี้สร้างได้ที่ 300 DPI)';
+}
+async function histXlsx() { const c = hv.cur; if (!c) return ''; return handOver(histFile('xlsx'), withCfg(c.cfg, () => buildXlsx(c.report, c.rev))); }
+async function histEdit() {
+  const c = hv.cur; if (!c) return;
+  const gone = c.cfg.aircraft.filter((a) => !acById(a.id)).map((a) => a.type + ' ' + a.tail);
+  if (!await ask({ title: 'นำรายงานนี้มาแก้ไข', message: 'ข้อมูลของ ' + title1(c.report).replace(/^.*ประจำวันที่ /, 'วันที่ ') + (c.rev ? ' REV.' + c.rev : '') + ' จะถูกใส่ในหน้ากรอกข้อมูลแทนสิ่งที่กำลังกรอกอยู่\n\nยังไม่ถูกบันทึกจนกว่าจะกด SAVE ซึ่งจะนับเป็น REV ถัดไปของวันที่รายงานนั้น'
+    + (gone.length ? '\n\nเครื่องบินที่ไม่มีในรายการปัจจุบันจะไม่ถูกนำมา: ' + gone.join(', ') : ''), ok: 'นำมาแก้ไข' })) return;
+  work = normReport(clone(c.report)); approvals = {}; pend = newPend(); touched = true;
+  renderAll(); saveDraft();
+  showPanel('edit');
+  toast('นำรายงานมาใส่หน้ากรอกข้อมูลแล้ว ยังไม่ถูกบันทึกจนกว่าจะกด SAVE');
+}
+
+/* ====================== buttons ====================== */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-act]');
+  if (!b || b.closest('dialog')) return;
+  const act = b.dataset.act;
+  if (act === 'clear') doClear();
+  else if (act === 'preview') doPreview();
+  else if (act === 'back') showPanel('edit');
+  else if (act === 'spdf') runInfo(b, exportPdf);
+  else if (act === 'sxlsx') runInfo(b, exportXlsx);
+  else if (act === 'sdb') runInfo(b, exportDb, 'h-info');
+  else if (act === 'pdf') doPdf();
+  else if (act === 'xlsx') withBusy($('btn-xlsx'), exportXlsx);
+  else if (act === 'save') withBusy($('btn-save'), async () => { await doSave(); });
+  else if (act === 'addline') addLine(b.dataset.path);
+  else if (act === 'rmline') {
+    const arr = getPath(work, b.dataset.path), i = +b.dataset.i;
+    if (arr.length > 1) arr.splice(i, 1); else arr[0] = '';
+    renderList(b.dataset.path, Math.min(i, arr.length - 1)); edited();
+  }
+  else if (act === 'cleardates' || act === 'lastdates') {
+    const s = work.ac[b.dataset.id], sv = saved.report && saved.report.ac[b.dataset.id];
+    s.from = act === 'lastdates' && sv ? sv.from : ''; s.to = act === 'lastdates' && sv ? sv.to : '';
+    $('f-' + b.dataset.id + '-from').value = s.from; $('f-' + b.dataset.id + '-to').value = s.to; edited();
+  }
+  else if (act === 'hist') openHist();
+  else if (act === 'gs') gsSettings();
+  else if (act === 'gsretry') gsFlush();
+  else if (act === 'hload') histLoad();
+  else if (act === 'hview') histView(+b.dataset.i);
+  else if (act === 'hpdf') runInfo(b, histPdf, 'h-vinfo');
+  else if (act === 'hxlsx') runInfo(b, histXlsx, 'h-vinfo');
+  else if (act === 'hedit') histEdit();
+  else if (act === 'hdel') histDelete();
+  else if (act === 'addac') addAircraft();
+  else if (act === 'rmac') removeItem('ac', b.dataset.id);
+  else if (act === 'addrow') addSum('row');
+  else if (act === 'addcol') addSum('col');
+  else if (act === 'rmrow') removeItem('row', b.dataset.id);
+  else if (act === 'rmcol') removeItem('col', b.dataset.id);
+  else if (act === 'rowup') moveRow(+b.dataset.i, -1);
+  else if (act === 'rowdown') moveRow(+b.dataset.i, 1);
+});
+window.addEventListener('pagehide', saveDraft);
+
+/* ====================== start ====================== */
+config = normConfig(lsGet('config'));
+saved = normState(lsGet('state'));
+sheets = normSheets(lsGet('sheets'));
+adoptWork();
+renderAll();
+fontsReady().then(refresh);
+connectStore();
+setInterval(fyRemind, 3600e3);
+})();
+</script>

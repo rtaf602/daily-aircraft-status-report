@@ -1,0 +1,13 @@
+import { open } from './harness_basic.mjs';
+const t = await open(); const { page } = t;
+await page.locator('#signs').scrollIntoViewIfNeeded();
+await page.click('#f-sign0-name'); await page.waitForTimeout(120);
+await page.locator('#pop .opt', { hasText: 'รังสรรค์' }).locator('.del').click(); await page.waitForTimeout(120);
+const box = await page.locator('#signs').boundingBox();
+await page.screenshot({ path: t.out('v3-sign.png'), clip: { x: Math.max(0, box.x - 20), y: Math.max(0, box.y - 60), width: 720, height: 560 } });
+await page.keyboard.press('Escape');
+for (const id of ['a319', 'a320_03', 'a320_05', 'a340_04', 'ssj_06', 'ssj_07', 'ssj_08']) for (let i = 0; i < (id === 'a340_04' ? 4 : 2); i++) await page.fill(`#f-${id}-sn${i}`, `SN${i}`);
+await page.click('#btn-save'); await page.waitForTimeout(300);
+await page.screenshot({ path: t.out('v3-saved.png'), clip: { x: 350, y: 300, width: 800, height: 400 } });
+console.log('dialog:', await t.dlgText(), '| errors:', JSON.stringify(t.errors));
+await t.browser.close();

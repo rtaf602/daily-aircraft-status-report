@@ -1,0 +1,44 @@
+import { open, readJson } from './harness.mjs';
+import fs from 'fs';
+const log = (...a) => console.log(...a);
+const old = readJson('old_state.json');
+const t = await open({ docs: old.db, gsFiles: old.files }), page = t.page;
+const v = (s) => page.inputValue(s);
+// ---- dates ----
+await t.type('#f-dateFrom', '2026-10-06');
+log('A single day follows:', await v('#f-dateTo'), 'min', await page.getAttribute('#f-dateTo', 'min'), 'max', await page.getAttribute('#f-dateTo', 'max'));
+await t.type('#f-dateTo', '2026-10-10'); log('A +4 days:', await v('#f-dateTo'), 'days', await v('#f-days'), '|', await t.txt('#title1'));
+await t.type('#f-dateTo', '2026-10-05'); log('A earlier →', await v('#f-dateTo'), '| toast:', await t.txt('#toast'));
+await t.type('#f-dateTo', '2026-11-02'); log('A next month:', await v('#f-dateTo'), 'days', await v('#f-days'), '|', await t.txt('#title1'));
+await t.type('#f-dateFrom', '2026-10-08'); log('A from moves inside range → to stays:', await v('#f-dateTo'));
+await t.type('#f-dateFrom', '2026-11-05'); log('A from moves past to → to follows:', await v('#f-dateTo'));
+await t.type('#f-dateFrom', '2026-10-06'); await t.type('#f-dateTo', '2026-10-06');
+// ---- typed second status line, long CHECK name, long note, long position ----
+log('B sched readonly:', await page.getAttribute('#f-a319-sched', 'readonly'));
+await page.click('#f-a319-sched'); await page.waitForTimeout(150);
+log('B sched list:', (await page.locator('#pop .opt').allInnerTexts()).join(' / '));
+await page.fill('#f-a319-sched', 'WAITING PARTS'); await page.locator('#f-a319-sched').blur(); await page.waitForTimeout(150);
+await page.fill('#f-a320_03-sched', 'รอการอนุมัติซ่อมบำรุงจากหน่วยเหนือ'); await page.locator('#f-a320_03-sched').blur();
+await page.fill('#f-a319-check', 'SPECIAL INSPECTION AFTER BIRD STRIKE'); await page.locator('#f-a319-check').blur(); await page.waitForTimeout(150);
+await t.type('#f-a319-from', '2026-10-01'); await t.type('#f-a319-to', '2026-10-19');
+await page.fill('#f-ac-a320_03-notes-0', 'หมายเหตุยาวปานกลาง รอ TG ยืนยันวันเข้า'); await page.locator('#f-ac-a320_03-notes-0').blur();
+await page.fill('#f-ac-a320_05-notes-0', 'หมายเหตุยาวมากเกินกว่าจะย่อถึง 8 พอยต์แล้วพอดี รอ TG ยืนยันวันเข้าซ่อมอีกครั้งหนึ่ง'); await page.locator('#f-ac-a320_05-notes-0').blur();
+await page.fill('#f-sign-0-pos-0', 'น.ควบคุมมาตรฐาน กทน.บน.๖ และรักษาราชการ รอง หน.ฝกช.ฝูง.๖๐๒ บน.๖ ทำการแทน หน.ฝกช.ฝูง.๖๐๒ บน.๖'); await page.locator('#f-sign-0-pos-0').blur(); await page.waitForTimeout(200);
+const cls = async (id) => (await page.getAttribute('#' + id, 'class') || '') + '|' + (await page.getAttribute('#' + id, 'title') || '');
+log('B flags: sched a319', await cls('f-a319-sched'), '· sched a320_03', await cls('f-a320_03-sched'), '· check', await cls('f-a319-check'), '· note mid', await cls('f-ac-a320_03-notes-0'), '· note long', await cls('f-ac-a320_05-notes-0'), '· pos', await cls('f-sign-0-pos-0'), '· UNSCHEDULE row', await cls('f-a320_05-sched'), await v('#f-a320_05-sched'));
+await page.click('#btn-preview'); await page.waitForTimeout(1200);
+const url = await page.evaluate(() => document.getElementById('paper').toDataURL('image/png'));
+fs.writeFileSync(t.out('v8-paper.png'), Buffer.from(url.split(',')[1], 'base64'));
+await page.click('#btn-preview'); await page.waitForTimeout(200);
+await page.click('#btn-save'); await page.waitForTimeout(2000);
+log('C save dialog:', (await t.dlgText()).slice(0, 200), '| saved:', await t.txt('#saved-line'));
+await page.click('#panel-saved [data-act=sxlsx]'); await page.waitForTimeout(900);
+const x = await page.evaluate(() => window.__saved);
+fs.writeFileSync(t.out('v8.xlsx'), Buffer.from(x[0].b64, 'base64'));
+log('C xlsx fonts:', JSON.stringify([...Buffer.from(x[0].b64, 'base64').toString('latin1').matchAll(/<sz val="([0-9.]+)"/g)].map((m) => m[1])));   // the file is a stored (uncompressed) zip, so styles.xml can be read straight from the bytes
+await page.click('#panel-saved [data-act=back]'); await page.waitForTimeout(200);
+await page.click('#f-a319-sched'); await page.waitForTimeout(150);
+log('C sched list after SAVE:', (await page.locator('#pop .opt').allInnerTexts()).join(' / '), '| value kept:', await v('#f-a319-sched'));
+log('C DATA row in sheet (ประเภท):', (await t.tab('DATA')).rows.concat((await t.tab('DATA', t.FILE_B) || { rows: [] }).rows).filter((r) => r[0] === 'r2026-10-06_001').map((r) => r[13]).join(' ; '));
+log('errors:', JSON.stringify(t.errors));
+await t.browser.close();

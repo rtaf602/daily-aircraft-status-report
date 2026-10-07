@@ -1,0 +1,24 @@
+import { open, readJson, PW } from './harness.mjs';
+import fs from 'fs';
+const log = (...a) => console.log(...a);
+const live = readJson('live_state.json');
+const t = await open({ docs: live.db, gsFiles: live.files }), page = t.page;
+const n = async (file) => { const o = []; for (const k of ['ARCHIVE', 'DATA', 'SUMMARY']) { const x = await t.tab(k, file); o.push(x ? x.rows.length : '-'); } return o.join('/'); };
+const db = (k) => page.evaluate((k) => window.__db[k], k);
+const set = async (fy, main, bk) => { await page.click('#gs-chip'); await page.waitForTimeout(250); await page.fill('#dlg input[name=fy]', fy); if (main) await page.fill('#dlg input[name=link]', main); if (bk) await page.fill('#dlg input[name=blink]', bk); await t.pass(PW.sheet); await page.waitForTimeout(8000); };
+await set('70', '', t.BK_B);
+log('0 rows A', await n(t.FILE), 'B', await n(t.FILE_B), 'BK_B', await n(t.BK_B));
+// FY 69 gets a new main file and a BACKUP file in one go
+await page.evaluate(() => { window.__gs.calls.length = 0; });
+await set('69', t.FILE_C, t.BK_A);
+log('1 toast:', await t.txt('#toast'));
+log('1 rows old A', await n(t.FILE), '| new main C', await n(t.FILE_C), '| BK_A', await n(t.BK_A), '| carry', JSON.stringify((await db('app/sheets')).carry), '| files69', (await db('app/sheets')).files['69'].id.slice(0, 6), 'backups', Object.keys((await db('app/sheets')).backups).join(','));
+log('1 C ids:', (await t.tab('ARCHIVE', t.FILE_C)).rows.map((r) => r[0]).join(','));
+const eq = await page.evaluate(() => { const g = window.__gs.files, a = (f, t) => JSON.stringify(g[f].sheets.find((s) => s.properties.title === t).rows); return ['ARCHIVE', 'DATA', 'SUMMARY'].map((t) => [a('FILE_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', t) === a('FILE_CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC', t), a('FILE_CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC', t) === a('BKUP_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', t)]); });
+log('1 old A == new C, new C == BK_A (ARCHIVE/DATA/SUMMARY):', JSON.stringify(eq));
+log('1 writes to old A:', (await page.evaluate(() => window.__gs.calls)).filter((c) => c.tool === 'update_spreadsheet' && c.input.spreadsheetId.startsWith('FILE_A')).length);
+log('1 about B (FY70) link rows:', JSON.stringify((await page.evaluate(() => window.__gs.files.FILE_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB.sheets[0].rows.slice(-2).map((r) => r.map((c) => c && c.userEnteredValue ? (c.userEnteredValue.formulaValue || c.userEnteredValue.stringValue) : ''))))).slice(0, 260));
+await page.click('#btn-hist'); await page.waitForTimeout(900);
+log('1 sources:', (await page.locator('#h-src option').allInnerTexts()).join(' || '));
+log('errors:', JSON.stringify(t.errors));
+await t.browser.close();

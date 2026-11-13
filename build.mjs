@@ -52,6 +52,9 @@ const siteEdits = [
   { why: 'every step of a SAVE is a trip to the back end here, so the lock that keeps two devices from saving at once is held for longer',
     from: "    locked = await lease(store.lock, 20000);",
     to: "    locked = await lease(store.lock, 60000);" },
+  { why: 'the OPS 602 bar (/app/back.js, repo app) sits on top of the page here: the sticky bar stops under it',
+    from: ".bar { position: sticky; top: env(safe-area-inset-top, 0px);",
+    to: ".bar { position: sticky; top: var(--ops602-h, env(safe-area-inset-top, 0px));" },
 ];
 let site = page.replace(CONTACT[0], () => "(((window.__status602 || {}).contact || [])[0]) || 'ผู้ดูแลระบบของหน่วย'").replace(CONTACT[1], () => "(((window.__status602 || {}).contact || [])[1]) || ''");
 for (const e of siteEdits) {
@@ -85,8 +88,10 @@ img { max-width: 100%; }
 `;
 const out = process.env.SITE_OUT ? process.env.SITE_OUT.replace(/[\\/]$/, '') + '/' : at('./site/');
 fs.mkdirSync(out, { recursive: true });
-fs.writeFileSync(out + 'index.html', shell + client + site + '\n</html>\n');
+// แถบ OPS 602 ด้านบน (ซ้าย: กลับหน้ารวม, ขวา: REFRESH) มาจาก repo app ไฟล์เดียวใช้ร่วมกันทุกระบบ ห้ามลบ
+const opsBar = '\n<script src="/app/back.js" defer></script>';
+fs.writeFileSync(out + 'index.html', shell + client + site + opsBar + '\n</html>\n');
 fs.writeFileSync(out + '.nojekyll', '');
 const kb = (t) => Math.round(Buffer.byteLength(t) / 1024) + ' KB';
 console.log('built dist/daily-aircraft-status.html', kb(s), contactFile ? '(Claude artifact)' : '(Claude artifact — WITHOUT the administrator contact lines: the private folder was not found)');
-console.log('built ' + (process.env.SITE_OUT ? out : 'site/') + 'index.html', kb(shell + client + site), backendUrl ? '(web site with the shared back end)' : '(web site, every browser keeps its own data: no back-end address set)');
+console.log('built ' + (process.env.SITE_OUT ? out : 'site/') + 'index.html', kb(shell + client + site + opsBar), backendUrl ? '(web site with the shared back end)' : '(web site, every browser keeps its own data: no back-end address set)');
